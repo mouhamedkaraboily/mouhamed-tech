@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOUHAMED TECH — Panneau Administrateur</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght=400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root { --bg: #030a16; --card-bg: #0a1526; --blue: #0a7cff; --accent: #00e5ff; --green: #00d97e; --red: #ff3b30; --white: #ffffff; --gray: #64748b; --dark-gray: #1e293b; --orange: #ff9500; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: var(--bg); color: var(--white); padding: 25px; min-height: 100vh; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.05); margin-bottom: 25px; }
+        header h1 { font-size: 30px; font-weight: 900; }
+        header h1 span { color: var(--accent); }
+        .admin-clock { font-size: 20px; font-weight: 700; color: var(--accent); background: rgba(0,229,255,0.05); padding: 8px 20px; border-radius: 12px; text-transform: capitalize; }
+
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-bottom: 30px; }
+        .panel { background: var(--card-bg); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.05); }
+        .panel-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); }
+
+        .select-box { width: 100%; padding: 14px; background: var(--dark-gray); border: 2px solid var(--blue); border-radius: 12px; color: white; font-size: 16px; font-weight: 700; outline: none; margin-bottom: 20px; }
+
+        .error-locked-msg { background: rgba(255, 59, 48, 0.15); border: 1px solid var(--red); color: #ff6b63; border-radius: 12px; padding: 15px; font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 15px; display: none; }
+
+        .control-card { background: var(--dark-gray); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .current-status-display { font-size: 14px; color: var(--gray); font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
+        .current-ticket-display { font-size: 48px; font-weight: 900; color: var(--accent); margin-bottom: 15px; }
+
+        .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+        button:disabled { opacity: 0.25 !important; cursor: not-allowed !important; background: var(--gray) !important; }
+        .btn-call { background: var(--blue); color: white; grid-column: span 2; }
+        .btn-call:hover:not(:disabled) { background: #0066de; }
+        .btn-recall { background: var(--orange); color: white; }
+        .btn-recall:hover:not(:disabled) { background: #e08200; }
+        .btn-release { background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-release:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+
+        /* Nouveaux boutons et badges pour les Absents */
+        .btn-absent { background: #551a8b; color: white; }
+        .btn-absent:hover:not(:disabled) { background: #40106a; }
+        .btn-re-call-absent { background: var(--accent); color: #030a16; font-size: 12px; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .btn-re-call-absent:hover { opacity: 0.9; }
+
+        .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+        .mini-card { background: var(--dark-gray); padding: 15px; border-radius: 12px; text-align: center; font-size: 14px; border: 1px solid transparent; }
+        .mini-card.occupied { border-color: var(--red); background: rgba(255, 59, 48, 0.02); }
+        .mini-card strong { display: block; font-size: 20px; color: var(--accent); margin-top: 5px; }
+
+        .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 15px; }
+        .config-row input { width: 80px; padding: 8px; background: var(--dark-gray); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; text-align: center; font-weight: 700; outline: none; }
+        .config-row input:focus { border-color: var(--blue); }
+        .btn-validate-limit { background: var(--green); color: #030a16; font-size: 13px; padding: 8px 14px; border-radius: 8px; font-weight: 700; width: auto; margin-left: 10px; display: inline-flex; align-items: center; }
+        .btn-validate-limit:hover { opacity: 0.9; }
+        .btn-danger { background: var(--red); color: white; width: 100%; margin-top: 15px; }
+
+        .table-container { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 15px; }
+        th { color: var(--gray); font-weight: 700; text-transform: uppercase; font-size: 13px; }
+        
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .status-badge.En-attente { background: rgba(255,255,255,0.05); color: var(--gray); }
+        .status-badge.Appelé { background: rgba(10,124,255,0.1); color: var(--blue); }
+        .status-badge.Confirmé { background: rgba(0,229,255,0.1); color: var(--accent); }
+        .status-badge.Patient-Présent { background: rgba(0,217,126,0.1); color: var(--green); }
+        .status-badge.Terminé { background: rgba(255,255,255,0.02); color: #475569; }
+        .status-badge.Absent { background: rgba(255, 59, 48, 0.15); color: #ff6b63; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>MOUHAMED<span>TECH</span> — Espace Admin</h1>
+    <div class="admin-clock" id="adminClock">Chargement du calendrier...</div>
+</header>
+
+<div class="dashboard-grid">
+    <div class="panel">
+        <div class="panel-title">🕹️ Guichet de Travail</div>
+        <select class="select-box" id="selectGuichetActif" onchange="changerGuichetEcoute(this.value)">
+            <option value="1">Travailler sur le GUICHET 01</option>
+            <option value="2">Travailler sur le GUICHET 02</option>
+            <option value="3">Travailler sur le GUICHET 03</option>
+            <option value="4">Travailler sur le GUICHET 04</option>
+            <option value="5">Travailler sur le GUICHET 05</option>
+        </select>
+
+        <div class="error-locked-msg" id="lockMessage">
+            ⚠️ Ce guichet est déjà occupé par un autre administrateur. Veuillez en choisir un autre.
+        </div>
+
+        <div class="control-card">
+            <div class="current-status-display" id="txtStatutActuel">Statut : Libre</div>
+            <div class="current-ticket-display" id="txtTicketActuel">—</div>
+            
+            <div class="grid-buttons">
+                <button class="btn-call" id="btnAdminCall" onclick="appelerPatientSuivant()">📢 Appeler le Suivant</button>
+                <button class="btn-recall" id="btnAdminRecall" onclick="rappelerMemePatient()">🔄 Rappeler</button>
+                <button class="btn-release" id="btnAdminRelease" onclick="libererGuichetActif()">🔓 Libérer / Terminer</button>
+                <button class="btn-absent" id="btnAdminAbsent" onclick="marquerPatientAbsent()">❌ Absent</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">🖥️ Vue d'ensemble de la salle</div>
+        <div class="status-grid" id="miniStatusGrid"></div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">⚙️ Configuration & Données</div>
+        
+        <div class="config-row" style="justify-content: space-between;">
+            <label style="flex:1;">Limite de clients autorisés :</label>
+            <div style="display: flex; align-items: center;">
+                <input type="number" id="inputLimit" min="1" placeholder="Ex: 50">
+                <button class="btn-validate-limit" onclick="validerNouvelleLimite()">💾 Valider</button>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 15px 0;">
+        <div class="config-row"><span>Total Inscrits :</span><strong id="statTotal" style="color:var(--accent);">0</strong></div>
+        <div class="config-row"><span>En Attente :</span><strong id="statAttente" style="color:var(--blue);">0</strong></div>
+        
+        <button class="btn-danger" onclick="reinitialiserFileAttente()">🔄 Vider la file d'aujourd'hui</button>
+    </div>
+</div>
+
+<!-- NOUVEAU : Liste autonome des patients absents -->
+<div class="panel" style="margin-bottom: 25px;">
+    <div class="panel-title" style="color: var(--orange);">⏱️ Patients Absents (Rappel Possible)</div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Numéro</th>
+                    <th>Nom Complet</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="absentsTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-title">📋 Historique et Suivi des Patients</div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Numéro</th>
+                    <th>Nom Complet</th>
+                    <th>WhatsApp</th>
+                    <th>Arrivée</th>
+                    <th>Statut</th>
+                    <th>Guichet</th>
+                </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBfX2hJEV035PT7F2mxQ0_gNEzON-nCXoM",
+        authDomain: "mouhamed-tech-database.firebaseapp.com",
+        databaseURL: "https://mouhamed-tech-database-default-rtdb.firebaseio.com",
+        projectId: "mouhamed-tech-database",
+        storageBucket: "mouhamed-tech-database.firebasestorage.app",
+        messagingSenderId: "178632163158",
+        appId: "1:178632163158:web:6b48bcfb12e1c37fe3e0f7"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const monIdSessionAdmin = "admin_" + Math.random().toString(36).substr(2, 9);
+
+    function clockAdmin() {
+        const d = new Date();
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        document.getElementById('adminClock').textContent = `${d.toLocaleDateString('fr-FR', options)} — ${d.toLocaleTimeString('fr-FR')}`;
+    }
+    setInterval(clockAdmin, 1000);
+
+    function getTodayDateStr() {
+        const d = new Date();
+        return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+    }
+    const dStr = getTodayDateStr();
+
+    let guichetSelectionne = 1;
+    let referenceEcouteGuichet = null;
+
+    db.ref('file_attente/config_global/limite_globale').on('value', snap => {
+        if(snap.exists()) {
+            document.getElementById("inputLimit").value = snap.val();
+        }
+    });
+
+    function validerNouvelleLimite() {
+        const inputVal = document.getElementById("inputLimit").value;
+        if(inputVal && parseInt(inputVal) > 0) {
+            db.ref('file_attente/config_global').update({ 
+                limite_globale: parseInt(inputVal) 
+            }).then(() => {
+                alert(`🎯 Limite de clients mise à jour avec succès : ${inputVal} max.`);
+            }).catch((err) => {
+                alert("Erreur lors de l'enregistrement : " + err.message);
+            });
+        } else {
+            alert("Veuillez saisir un nombre valide de clients supérieur à 0.");
+        }
+    }
+
+    function quitterGuichetPrecedent(idGuichet) {
+        db.ref(`file_attente/guichets/guichet_${idGuichet}/session_admin`).once('value', snap => {
+            if(snap.val() === monIdSessionAdmin) {
+                db.ref(`file_attente/guichets/guichet_${idGuichet}/session_admin`).remove();
+            }
+        });
+    }
+
+    function changerGuichetEcoute(numGuichet) {
+        quitterGuichetPrecedent(guichetSelectionne);
+        
+        guichetSelectionne = parseInt(numGuichet);
+        if(referenceEcouteGuichet) referenceEcouteGuichet.off();
+        
+        referenceEcouteGuichet = db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`);
+        referenceEcouteGuichet.on('value', snap => {
+            const gData = snap.val() || { statut: "Libre", ticket: "Libre", session_admin: "" };
+            
+            document.getElementById("txtStatutActuel").textContent = `Statut : ${gData.statut}`;
+            document.getElementById("txtTicketActuel").textContent = (gData.ticket === "Libre") ? "—" : gData.ticket;
+
+            const msgVerrou = document.getElementById("lockMessage");
+            const btnCall = document.getElementById("btnAdminCall");
+            const btnRecall = document.getElementById("btnAdminRecall");
+            const btnRelease = document.getElementById("btnAdminRelease");
+            const btnAbsent = document.getElementById("btnAdminAbsent");
+
+            if(gData.session_admin && gData.session_admin !== monIdSessionAdmin) {
+                msgVerrou.style.display = "block";
+                btnCall.disabled = true;
+                btnRecall.disabled = true;
+                btnRelease.disabled = true;
+                btnAbsent.disabled = true;
+            } else {
+                msgVerrou.style.display = "none";
+                btnCall.disabled = false;
+                btnRecall.disabled = false;
+                btnRelease.disabled = false;
+                btnAbsent.disabled = false;
+
+                if(!gData.session_admin) {
+                    db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({ session_admin: monIdSessionAdmin });
+                }
+            }
+        });
+    }
+
+    window.addEventListener('beforeunload', () => { quitterGuichetPrecedent(guichetSelectionne); });
+
+    db.ref('file_attente/guichets').on('value', snap => {
+        const data = snap.val() || {};
+        const grid = document.getElementById("miniStatusGrid");
+        grid.innerHTML = "";
+        
+        for(let i=1; i<=5; i++) {
+            let g = data[`guichet_${i}`] || { statut: "Libre", ticket: "Libre", session_admin: "" };
+            let tAffiche = (g.ticket === "Libre") ? "—" : g.ticket;
+            
+            let isOccupied = (g.session_admin && g.session_admin !== monIdSessionAdmin) ? "occupied" : "";
+            let infoAdminText = isOccupied ? "<div style='color:var(--red);font-weight:700;'>Bloqué (Admin)</div>" : `<div style="font-size:11px; color:var(--gray); margin-top:4px;">${g.statut}</div>`;
+
+            grid.innerHTML += `
+                <div class="mini-card ${isOccupied}">
+                    <div>G0${i}</div>
+                    <strong>${tAffiche}</strong>
+                    ${infoAdminText}
+                </div>
+            `;
+        }
+    });
+
+    db.ref(`file_attente/historique_jours/${dStr}/tickets`).on('value', snap => {
+        const tbody = document.getElementById("adminTableBody");
+        const tbodyAbsents = document.getElementById("absentsTableBody");
+        
+        tbody.innerHTML = "";
+        tbodyAbsents.innerHTML = "";
+        
+        let total = 0, attente = 0, totalAbsents = 0;
+        
+        snap.forEach(child => {
+            let t = child.val();
+            total++;
+            if(t.statut === "En attente") attente++;
+
+            let cleanStatut = t.statut.replace(/ /g, "-");
+            let displayGuichet = t.guichet ? `G0${t.guichet}` : "—";
+            let displayWa = t.whatsapp ? t.whatsapp : "—";
+            
+            let displayDate = "—";
+            if(t.timestamp) {
+                let dateInst = new Date(t.timestamp);
+                displayDate = String(dateInst.getHours()).padStart(2, '0') + "h" + String(dateInst.getMinutes()).padStart(2, '0');
+            }
+
+            // Alimentation du tableau principal général
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${t.numero}</strong></td>
+                    <td>${t.nom}</td>
+                    <td style="color:var(--green); font-weight:600;">${displayWa}</td>
+                    <td>${displayDate}</td>
+                    <td><span class="status-badge ${cleanStatut}">${t.statut}</span></td>
+                    <td><mark style="background:none; color:var(--accent); font-weight:bold;">${displayGuichet}</mark></td>
+                </tr>
+            `;
+
+            // Alimentation du tableau autonome des absents
+            if(t.statut === "Absent") {
+                totalAbsents++;
+                tbodyAbsents.innerHTML += `
+                    <tr>
+                        <td><strong style="color:var(--orange);">${t.numero}</strong></td>
+                        <td>${t.nom}</td>
+                        <td><button class="btn-re-call-absent" onclick="reengagerAbsent('${t.numero}')">📢 Rappeler au G0${guichetSelectionne}</button></td>
+                    </tr>
+                `;
+            }
+        });
+
+        if(totalAbsents === 0) {
+            tbodyAbsents.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--gray);">Aucun patient absent pour le moment.</td></tr>`;
+        }
+
+        document.getElementById("statTotal").textContent = total;
+        document.getElementById("statAttente").textContent = attente;
+    });
+
+    function appelerPatientSuivant() {
+        db.ref(`file_attente/historique_jours/${dStr}/tickets`).once('value', snap => {
+            let prochainTicketKey = null;
+            let prochainTicketNum = null;
+
+            snap.forEach(child => {
+                if(!prochainTicketKey && child.val().statut === "En attente") {
+                    prochainTicketKey = child.key;
+                    prochainTicketNum = child.val().numero;
+                }
+            });
+
+            if(prochainTicketKey) {
+                db.ref(`file_attente/historique_jours/${dStr}/tickets/${prochainTicketKey}`).update({
+                    statut: "Appelé",
+                    guichet: guichetSelectionne
+                });
+                db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({
+                    statut: "Appel en cours",
+                    ticket: prochainTicketNum,
+                    force_vocal: Math.random() 
+                });
+            } else {
+                alert("Aucun patient en attente dans la file.");
+            }
+        });
+    }
+
+    function rappelerMemePatient() {
+        db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).once('value', snap => {
+            let currentTick = snap.val() ? snap.val().ticket : "Libre";
+            let currentStatut = snap.val() ? snap.val().statut : "Libre";
+            
+            if(currentTick !== "Libre" && currentStatut === "Appel en cours") {
+                db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({
+                    statut: "Appel en cours",
+                    force_vocal: Math.random() 
+                });
+            } else {
+                alert("Aucun patient n'est actuellement en cours d'appel sur ce guichet.");
+            }
+        });
+    }
+
+    function libererGuichetActif() {
+        db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).once('value', snap => {
+            let tickNum = snap.val() ? snap.val().ticket : null;
+            if(tickNum && tickNum !== "Libre") {
+                db.ref(`file_attente/historique_jours/${dStr}/tickets`).orderByChild('numero').equalTo(tickNum).once('value', s => {
+                    s.forEach(c => { c.ref.update({ statut: "Terminé" }); });
+                });
+            }
+            db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({
+                statut: "Libre",
+                ticket: "Libre"
+            });
+        });
+    }
+
+    // NOUVEAU : Fonction pour marquer le patient comme "Absent"
+    function marquerPatientAbsent() {
+        db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).once('value', snap => {
+            let tickNum = snap.val() ? snap.val().ticket : null;
+            if(tickNum && tickNum !== "Libre") {
+                db.ref(`file_attente/historique_jours/${dStr}/tickets`).orderByChild('numero').equalTo(tickNum).once('value', s => {
+                    s.forEach(c => { c.ref.update({ statut: "Absent" }); });
+                });
+                db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({
+                    statut: "Libre",
+                    ticket: "Libre"
+                });
+            } else {
+                alert("Aucun patient n'est en cours d'appel sur ce guichet.");
+            }
+        });
+    }
+
+    // NOUVEAU : Fonction pour rappeler un patient absent
+    function reengagerAbsent(numeroTicket) {
+        db.ref(`file_attente/historique_jours/${dStr}/tickets`).orderByChild('numero').equalTo(numeroTicket).once('value', s => {
+            s.forEach(c => { c.ref.update({ statut: "Appelé", guichet: guichetSelectionne }); });
+        });
+
+        db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({
+            statut: "Appel en cours",
+            ticket: numeroTicket,
+            force_vocal: Math.random()
+        });
+    }
+
+    function reinitialiserFileAttente() {
+        if(confirm("⚠️ ATTENTION : Êtes-vous sûr de vouloir vider COMPLÈTEMENT la file d'attente d'aujourd'hui ?")) {
+            db.ref(`file_attente/historique_jours/${dStr}`).remove();
+            for(let i=1; i<=5; i++) {
+                db.ref(`file_attente/guichets/guichet_${i}`).set({ statut: "Libre", ticket: "Libre" });
+            }
+        }
+    }
+
+    changerGuichetEcoute(1);
+</script>
+</body>
+</html>
