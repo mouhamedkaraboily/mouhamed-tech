@@ -3,232 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOUHAMED TECH — Écran Salle d'Attente</title>
+    <title>MOUHAMED TECH — Écran Géant Salle d'Attente</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght=400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <style>
-        :root { 
-            --bg: #030a16; 
-            --card-bg: #0a1526; 
-            --blue: #0a7cff; 
-            --accent: #00e5ff; 
-            --green: #00d97e; 
-            --white: #ffffff; 
-            --gray: #475569; 
-        }
+        :root { --bg: #030a16; --card-bg: #0a1526; --blue: #0a7cff; --accent: #00e5ff; --green: #00d97e; --white: #ffffff; --gray: #64748b; --dark-gray: #1e293b; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background: var(--bg); color: var(--white); height: 100vh; display: flex; flex-direction: column; overflow: hidden; padding: 25px; }
+        body { background: var(--bg); color: var(--white); height: 100vh; overflow: hidden; display: flex; flex-direction: column; padding: 30px; }
 
-        header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.05); }
-        header h1 { font-size: 38px; font-weight: 900; letter-spacing: 1px; }
+        header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 3px solid rgba(255, 255, 255, 0.05); margin-bottom: 30px; }
+        header h1 { font-size: 36px; font-weight: 900; letter-spacing: 1px; }
         header h1 span { color: var(--accent); }
-        .live-clock { font-size: 26px; font-weight: 800; color: var(--accent); background: rgba(0,229,255,0.07); padding: 8px 22px; border-radius: 12px; text-transform: capitalize; }
-
-        .tv-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; flex: 1; margin-top: 25px; min-height: 0; }
-
-        .main-call-zone { background: linear-gradient(145deg, #0a7cff 0%, #0056cc 100%); border-radius: 32px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 20px 50px rgba(10,124,255,0.3); position: relative; animation: pulseGlow 3s infinite alternate; }
-        .main-call-zone.empty { background: var(--card-bg); box-shadow: none; animation: none; border: 2px dashed rgba(255,255,255,0.1); }
-        .badge-status { font-size: 18px; font-weight: 900; text-transform: uppercase; letter-spacing: 4px; color: rgba(255,255,255,0.7); margin-bottom: 15px; }
-        .main-ticket { font-size: 140px; font-weight: 900; line-height: 1; color: var(--white); margin-bottom: 10px; text-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-        .main-patient { font-size: 52px; font-weight: 800; color: var(--accent); margin-bottom: 20px; }
-        .main-guichet { font-size: 32px; font-weight: 900; background: var(--white); color: #0056cc; padding: 10px 40px; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-
-        .side-zone { display: flex; flex-direction: column; gap: 20px; min-height: 0; }
-        .section-title { font-size: 18px; font-weight: 800; text-transform: uppercase; color: var(--gray); letter-spacing: 2px; }
-        .counters-list { display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; }
         
-        .counter-row { background: var(--card-bg); padding: 20px 30px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.03); }
-        .counter-row.active { border-color: var(--green); background: rgba(0, 217, 126, 0.04); }
-        .counter-name { font-size: 24px; font-weight: 800; }
-        .counter-ticket { font-size: 38px; font-weight: 900; color: var(--accent); }
-        .counter-status { font-size: 16px; font-weight: 600; color: var(--gray); text-transform: uppercase; }
-        .counter-row.active .counter-status { color: var(--green); }
+        .tv-clock { font-size: 22px; font-weight: 800; color: var(--accent); background: rgba(0, 229, 255, 0.05); padding: 10px 25px; border-radius: 16px; border: 1px solid rgba(0, 229, 255, 0.1); text-transform: capitalize; }
 
-        .audio-lock-screen { position: fixed; inset: 0; background: rgba(3,10,22,0.95); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .audio-btn { background: var(--blue); color: white; border: none; padding: 20px 40px; font-size: 22px; font-weight: 800; border-radius: 16px; cursor: pointer; box-shadow: 0 10px 30px rgba(10,124,255,0.4); margin-top: 20px; }
+        .main-container { display: flex; gap: 40px; flex: 1; height: calc(100vh - 150px); }
 
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 20px 40px rgba(10,124,255,0.2); }
-            100% { box-shadow: 0 20px 60px rgba(0,229,255,0.4); }
+        .priority-box {
+            flex: 1.2; background: radial-gradient(circle at top left, #0a1b3a, var(--card-bg)); border-radius: 32px; border: 2px solid rgba(0, 229, 255, 0.2); box-shadow: 0 0 50px rgba(0, 229, 255, 0.05);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px; position: relative; animation: pulse-border 2s infinite alternate;
         }
+        @keyframes pulse-border { 0% { border-color: rgba(0, 229, 255, 0.2); } 100% { border-color: rgba(0, 229, 255, 0.6); } }
+
+        .priority-label { font-size: 24px; text-transform: uppercase; letter-spacing: 4px; color: var(--gray); font-weight: 800; margin-bottom: 10px; }
+        .priority-ticket { font-size: 140px; font-weight: 900; color: var(--accent); line-height: 1.1; text-shadow: 0 0 40px rgba(0, 229, 255, 0.3); }
+        .priority-patient-name { font-size: 38px; font-weight: 800; color: var(--white); margin-top: 5px; margin-bottom: 25px; letter-spacing: 1px; text-transform: capitalize; }
+        .priority-guichet { font-size: 46px; font-weight: 800; background: var(--blue); color: white; padding: 12px 40px; border-radius: 20px; box-shadow: 0 10px 20px rgba(10, 124, 255, 0.3); }
+
+        /* Conteneur de droite réorganisé */
+        .others-box { flex: 1; background: var(--card-bg); border-radius: 32px; border: 1px solid rgba(255, 255, 255, 0.05); padding: 35px; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; }
+        
+        .section-group { display: flex; flex-direction: column; }
+        .others-title { font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--gray); margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px; }
+        .others-title.libre-title { color: #475569; }
+
+        .guichet-row { display: flex; justify-content: space-between; align-items: center; background: var(--dark-gray); padding: 15px 25px; border-radius: 20px; margin-bottom: 12px; border: 1px solid rgba(255, 255, 255, 0.02); }
+        .guichet-row .name-block { display: flex; flex-direction: column; }
+        .guichet-row .guichet-id { font-size: 24px; font-weight: 800; color: var(--white); }
+        .guichet-row .patient-id { font-size: 15px; font-weight: 600; color: var(--gray); text-transform: capitalize; }
+        
+        /* Badges de statuts sur la liste secondaire */
+        .guichet-row .ticket { font-size: 32px; font-weight: 900; color: var(--green); background: rgba(0, 217, 126, 0.08); padding: 4px 18px; border-radius: 12px; }
+        .guichet-row .status-libre { font-size: 16px; font-weight: 800; color: var(--gray); background: rgba(255, 255, 255, 0.03); padding: 6px 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); letter-spacing: 1px; }
+
+        .empty-global-state { text-align: center; color: var(--gray); margin-top: 60px; font-size: 20px; font-weight: 600; width: 100%; }
     </style>
 </head>
 <body>
 
-<div class="audio-lock-screen" id="audioLock">
-    <h2 style="font-size: 36px; font-weight: 900;">MOUHAMED TECH</h2>
-    <p style="color: #6b7c9a; margin-top: 10px; font-size: 18px;">Cliquez pour activer les annonces vocales automatiques de la salle d'attente.</p>
-    <button class="audio-btn" onclick="activerAudioTV()">📺 Activer les Haut-Parleurs</button>
-</div>
+    <header>
+        <h1>MOUHAMED<span>TECH</span> — Gestion de File</h1>
+        <div class="tv-clock" id="tvClock">Chargement du calendrier...</div>
+    </header>
 
-<header>
-    <h1>MOUHAMED<span>TECH</span></h1>
-    <div class="live-clock" id="liveClock">Chargement du calendrier...</div>
-</header>
-
-<div class="tv-layout">
-    <div class="main-call-zone empty" id="tvCallZone">
-        <div id="tvCallContent" style="display: none; width: 100%;">
-            <div class="badge-status">Appel en cours</div>
-            <div class="main-ticket" id="tvTicketNum">--</div>
-            <div class="main-patient" id="tvPatientName">Patient: --</div>
-            <div>
-                <span class="main-guichet" id="tvCounterNum">Guichet --</span>
+    <div class="main-container">
+        <div class="priority-box" id="priorityContainer">
+            <div class="empty-state" id="txtEmpty" style="font-size: 24px; color: var(--gray); font-weight: 600;">Aucun appel en cours.<br>Veuillez patienter...</div>
+            <div id="priorityContent" style="display: none; width: 100%;">
+                <div class="priority-label">Numéro Demandé</div>
+                <div class="priority-ticket" id="lblPriorityTicket">🔑 —</div>
+                <div class="priority-patient-name" id="lblPriorityName">—</div>
+                <div style="display: flex; justify-content: center;">
+                    <div class="priority-guichet" id="lblPriorityGuichet">GUICHET 00</div>
+                </div>
             </div>
         </div>
-        <div id="tvCallPlaceholder" style="font-size: 28px; font-weight: 700; color: var(--gray);">
-            Aucun appel en cours. Veuillez patienter.
+
+        <!-- Section de droite dynamique -->
+        <div class="others-box" id="sidePanelsContainer">
+            <!-- Bloc des guichets Actifs -->
+            <div class="section-group" id="groupActifs" style="display: none;">
+                <div class="others-title">Guichets Actifs</div>
+                <div id="listActifsGuichets"></div>
+            </div>
+
+            <!-- Bloc des guichets Libres -->
+            <div class="section-group" id="groupLibres" style="display: none;">
+                <div class="others-title libre-title">Guichets Libres</div>
+                <div id="listLibresGuichets"></div>
+            </div>
+            
+            <!-- Message de secours si TOUS les guichets de la DB sont introuvables -->
+            <div class="empty-global-state" id="msgNoGuichet" style="display: none;">
+                Tous les guichets sont hors ligne.
+            </div>
         </div>
     </div>
 
-    <div class="side-zone">
-        <div class="section-title">État des guichets</div>
-        <div class="counters-list" id="tvCountersList"></div>
-    </div>
-</div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfX2hJEV035PT7F2mxQ0_gNEzON-nCXoM",
+            authDomain: "mouhamed-tech-database.firebaseapp.com",
+            databaseURL: "https://mouhamed-tech-database-default-rtdb.firebaseio.com",
+            projectId: "mouhamed-tech-database",
+            storageBucket: "mouhamed-tech-database.firebasestorage.app",
+            messagingSenderId: "178632163158",
+            appId: "1:178632163158:web:6b48bcfb12e1c37fe3e0f7"
+        };
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyBfX2hJEV035PT7F2mxQ0_gNEzON-nCXoM",
-        authDomain: "mouhamed-tech-database.firebaseapp.com",
-        databaseURL: "https://mouhamed-tech-database-default-rtdb.firebaseio.com",
-        projectId: "mouhamed-tech-database",
-        storageBucket: "mouhamed-tech-database.firebasestorage.app",
-        messagingSenderId: "178632163158",
-        appId: "1:178632163158:web:6b48bcfb12e1c37fe3e0f7"
-    };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    function updateClock() {
-        const d = new Date();
-        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        document.getElementById('liveClock').textContent = `${d.toLocaleDateString('fr-FR', options)} — ${d.toLocaleTimeString('fr-FR')}`;
-    }
-    setInterval(updateClock, 1000);
-
-    function getTodayDateStr() {
-        const d = new Date();
-        return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-    }
-
-    const dStr = getTodayDateStr();
-    
-    // CORRECTION : On suit les jetons d'appels indépendamment pour CHAQUE guichet
-    let derniersIdAppelsParGuichet = { 1: "", 2: "", 3: "", 4: "", 5: "" };
-
-    function activerAudioTV() {
-        document.getElementById("audioLock").style.display = "none";
-        updateClock();
-        initialiserAbonnements();
-    }
-
-    function emettreBipDONG() {
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.frequency.setValueAtTime(580, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.4);
-            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.5);
-        } catch(e) {}
-    }
-
-    function annoncerAuHautParleur(ticket, nom, guichet) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); 
-            let numeroParle = ticket.replace('-', ' ').split('').join(' ');
-            let texte = `Le numéro ${numeroParle}, ${nom}, est attendu au guichet ${guichet}`;
-            let utterance = new SpeechSynthesisUtterance(texte);
-            utterance.lang = 'fr-FR';
-            utterance.rate = 0.82; 
-            window.speechSynthesis.speak(utterance);
+        function clockTv() {
+            const d = new Date();
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            document.getElementById('tvClock').textContent = `${d.toLocaleDateString('fr-FR', options)} — ${d.toLocaleTimeString('fr-FR')}`;
         }
-    }
+        setInterval(clockTv, 1000);
+        clockTv();
 
-    function initialiserAbonnements() {
-        db.ref('file_attente/guichets').on('value', snapshot => {
-            const data = snapshot.val() || {};
-            const conteneurTv = document.getElementById("tvCountersList");
-            conteneurTv.innerHTML = "";
+        let memoireForceVocal = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 
+        function lireAnnonceVocale(ticketNum, guichetId) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const phrase = `Numéro ${ticketNum}, veuillez vous présenter au guichet ${guichetId}.`;
+                const message = new SpeechSynthesisUtterance(phrase);
+                message.lang = 'fr-FR';
+                message.rate = 0.95;
+                window.speechSynthesis.speak(message);
+            }
+        }
+
+        db.ref('file_attente/guichets').on('value', snap => {
+            const guichetsData = snap.val() || {};
+            
             let guichetPrioritaireId = null;
             let ticketPrioritaireNum = null;
+            let nomPrioritairePatient = "";
+            let plusRecentTimestamp = 0;
+            let declencherVocal = false;
 
-            // 1. Analyse en temps réel des guichets et détection de TOUS les appels lancés
-            for(let i = 1; i <= 5; i++) {
-                let g = data[`guichet_${i}`] || { statut: "Libre", ticket: "Libre" };
-                let ticketAffichage = (g.ticket === "Libre" || g.statut === "Libre" || g.statut === "Occupé") ? "—" : g.ticket;
-                let classeActive = (g.statut === "Appel en cours" || g.statut === "Patient Présent") ? "active" : "";
-
-                conteneurTv.innerHTML += `
-                    <div class="counter-row ${classeActive}">
-                        <div>
-                            <div class="counter-name">Guichet 0${i}</div>
-                            <div class="counter-status">${g.statut}</div>
-                        </div>
-                        <div class="counter-ticket">${ticketAffichage}</div>
-                    </div>
-                `;
-
-                // Si ce guichet est en train d'appeler
-                if(g.statut === "Appel en cours" && g.ticket !== "Libre") {
-                    guichetPrioritaireId = i;
-                    ticketPrioritaireNum = g.ticket;
-
-                    // Génération du jeton unique pour ce guichet précis
-                    let idUniqueAppelGuichet = g.ticket + "_G" + i + "_" + (g.force_vocal || "");
+            // Analyse pour le guichet principal clignotant
+            for (let i = 1; i <= 5; i++) {
+                let g = guichetsData[`guichet_${i}`] || { statut: "Libre", ticket: "Libre", nom: "" };
+                
+                if (g.statut === "Appel en cours" && g.ticket !== "Libre") {
+                    let ts = g.date_action || 1;
                     
-                    // CORRECTION ESSENTIELLE : Si ce guichet a changé de ticket ou a recliqué sur "Rappeler",
-                    // on joue le son immédiatement sans se soucier du statut des autres guichets !
-                    if(derniersIdAppelsParGuichet[i] !== idUniqueAppelGuichet) {
-                        derniersIdAppelsParGuichet[i] = idUniqueAppelGuichet;
-                        
-                        // Récupération instantanée du nom du patient pour l'annoncer
-                        db.ref(`file_attente/historique_jours/${dStr}/tickets`).orderByChild('numero').equalTo(g.ticket).once('value', snap => {
-                            let nomPatient = "Patient";
-                            snap.forEach(c => { nomPatient = c.val().nom; });
-                            
-                            emettreBipDONG(); 
-                            setTimeout(() => {
-                                annoncerAuHautParleur(g.ticket, nomPatient, i);
-                            }, 650);
-                        });
+                    if (ts > plusRecentTimestamp) {
+                        plusRecentTimestamp = ts;
+                        guichetPrioritaireId = i;
+                        ticketPrioritaireNum = g.ticket;
+                        nomPrioritairePatient = g.nom || "";
                     }
-                } else if (g.statut === "Libre") {
-                    // Si le guichet redevient libre, on réinitialise son historique d'appel local
-                    derniersIdAppelsParGuichet[i] = "";
+
+                    if (g.force_vocal && g.force_vocal !== memoireForceVocal[i]) {
+                        memoireForceVocal[i] = g.force_vocal;
+                        declencherVocal = true; 
+                    }
                 }
             }
 
-            // 2. Affichage principal sur l'écran géant à gauche
-            const zoneAppel = document.getElementById("tvCallZone");
-            if(guichetPrioritaireId) {
-                zoneAppel.classList.remove("empty");
-                document.getElementById("tvCallPlaceholder").style.display = "none";
-                document.getElementById("tvCallContent").style.display = "block";
-                
-                document.getElementById("tvTicketNum").textContent = ticketPrioritaireNum;
-                document.getElementById("tvCounterNum").textContent = `Guichet 0${guichetPrioritaireId}`;
+            // Gestion de la boîte principale
+            const emptyBlock = document.getElementById("txtEmpty");
+            const contentBlock = document.getElementById("priorityContent");
 
-                db.ref(`file_attente/historique_jours/${dStr}/tickets`).orderByChild('numero').equalTo(ticketPrioritaireNum).once('value', snap => {
-                    let nomPatient = "Patient";
-                    snap.forEach(c => { nomPatient = c.val().nom; });
-                    document.getElementById("tvPatientName").textContent = `Patient : ${nomPatient}`;
-                });
+            if (guichetPrioritaireId !== null) {
+                emptyBlock.style.display = "none";
+                contentBlock.style.display = "block";
+
+                document.getElementById("lblPriorityTicket").textContent = ticketPrioritaireNum;
+                document.getElementById("lblPriorityName").textContent = nomPrioritairePatient;
+                document.getElementById("lblPriorityGuichet").textContent = `GUICHET 0${guichetPrioritaireId}`;
+
+                if (declencherVocal) {
+                    lireAnnonceVocale(ticketPrioritaireNum, guichetPrioritaireId);
+                }
             } else {
-                zoneAppel.classList.add("empty");
-                document.getElementById("tvCallPlaceholder").style.display = "block";
-                document.getElementById("tvCallContent").style.display = "none";
+                emptyBlock.style.display = "block";
+                contentBlock.style.display = "none";
+            }
+
+            // --- GESTION DES LISTES DYNAMIQUES (ACTIFS vs LIBRES) ---
+            const containerActifs = document.getElementById("listActifsGuichets");
+            const containerLibres = document.getElementById("listLibresGuichets");
+            
+            const panelGroupActifs = document.getElementById("groupActifs");
+            const panelGroupLibres = document.getElementById("groupLibres");
+            const msgNoGuichet = document.getElementById("msgNoGuichet");
+
+            containerActifs.innerHTML = "";
+            containerLibres.innerHTML = "";
+
+            let nbActifs = 0;
+            let nbLibres = 0;
+
+            for (let i = 1; i <= 5; i++) {
+                let g = guichetsData[`guichet_${i}`] || { statut: "Libre", ticket: "Libre", nom: "" };
+                
+                if (g.ticket !== "Libre") {
+                    // Le guichet est ACTIF (occupe ou appelle un patient)
+                    nbActifs++;
+                    let displayNomMini = g.nom ? g.nom : "En cours";
+                    containerActifs.innerHTML += `
+                        <div class="guichet-row">
+                            <div class="name-block">
+                                <div class="guichet-id">Guichet 0${i}</div>
+                                <div class="patient-id">${displayNomMini}</div>
+                            </div>
+                            <div class="ticket">${g.ticket}</div>
+                        </div>
+                    `;
+                } else {
+                    // Le guichet est LIBRE
+                    nbLibres++;
+                    containerLibres.innerHTML += `
+                        <div class="guichet-row" style="opacity: 0.65;">
+                            <div class="name-block">
+                                <div class="guichet-id" style="color: var(--gray);">Guichet 0${i}</div>
+                                <div class="patient-id">Disponible</div>
+                            </div>
+                            <div class="status-libre">LIBRE</div>
+                        </div>
+                    `;
+                }
+            }
+
+            // Règle d'affichage : Si 0 actif, on cache la section complète
+            if (nbActifs > 0) {
+                panelGroupActifs.style.display = "flex";
+            } else {
+                panelGroupActifs.style.display = "none";
+            }
+
+            // Règle d'affichage : Si 0 libre, on cache la section complète
+            if (nbLibres > 0) {
+                panelGroupLibres.style.display = "flex";
+            } else {
+                panelGroupLibres.style.display = "none";
+            }
+
+            // Sécurité si la base de données est complètement vide
+            if (nbActifs === 0 && nbLibres === 0) {
+                msgNoGuichet.style.display = "block";
+            } else {
+                msgNoGuichet.style.display = "none";
             }
         });
-    }
-</script>
+    </script>
 </body>
 </html>
