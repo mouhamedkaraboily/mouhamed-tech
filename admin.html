@@ -74,6 +74,40 @@
 </head>
 <body>
 
+<!-- ECRAN MOT DE PASSE -->
+<div id="passwordScreen" style="position:fixed;inset:0;background:#030a16;z-index:9999;display:flex;align-items:center;justify-content:center;">
+  <div style="background:#0a1526;border:1px solid rgba(0,229,255,0.15);border-radius:24px;padding:48px 40px;width:100%;max-width:400px;text-align:center;box-shadow:0 0 60px rgba(0,229,255,0.08);">
+    <div style="font-size:48px;margin-bottom:16px;">&#128274;</div>
+    <h2 style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;">Espace Administrateur</h2>
+    <p style="color:#64748b;font-size:14px;margin-bottom:28px;">Entrez le mot de passe pour acceder</p>
+    <input type="password" id="pwdInput" placeholder="Mot de passe..."
+      onkeydown="if(event.key==='Enter')checkPwd()"
+      style="width:100%;padding:14px 18px;background:#1e293b;border:2px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;font-size:16px;font-family:'Outfit',sans-serif;outline:none;margin-bottom:12px;transition:border .2s;"
+      onfocus="this.style.borderColor='#0a7cff'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'"/>
+    <div id="pwdError" style="display:none;color:#ff3b30;font-size:13px;font-weight:700;margin-bottom:10px;">&#10060; Mot de passe incorrect</div>
+    <button onclick="checkPwd()"
+      style="width:100%;padding:14px;background:linear-gradient(135deg,#0a7cff,#0056cc);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:transform .2s;"
+      onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+      Acceder &#8594;
+    </button>
+  </div>
+</div>
+<script>
+function checkPwd(){
+  var v=document.getElementById("pwdInput").value;
+  var err=document.getElementById("pwdError");
+  if(v==="hamed kara"){
+    document.getElementById("passwordScreen").style.display="none";
+    err.style.display="none";
+  } else {
+    err.style.display="block";
+    document.getElementById("pwdInput").value="";
+    document.getElementById("pwdInput").style.borderColor="#ff3b30";
+    setTimeout(function(){document.getElementById("pwdInput").style.borderColor="rgba(255,255,255,0.08)";},1000);
+  }
+}
+</script>
+
 <header>
     <h1>MOUHAMED<span>TECH</span> — Espace Admin</h1>
     <div class="admin-clock" id="adminClock">Chargement du calendrier...</div>
