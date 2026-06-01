@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
-        :root { --bg: #071126; --card-bg: #0d1e3d; --blue: #0a7cff; --accent: #00e5ff; --green: #00d97e; --white: #ffffff; --gray: #6b7c9a; --red: #ff3b30; --dark-gray: #162a4a; }
+        :root { --bg: #071126; --card-bg: #0d1e3d; --blue: #0a7cff; --accent: #00e5ff; --green: #00d97e; --white: #ffffff; --gray: #6b7c9a; --red: #ff3b30; --dark-gray: #162a4a; --orange: #ff9500; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
         body { background: var(--bg); color: var(--white); padding: 20px; min-height: 100vh; }
         header { text-align: center; padding: 10px 0 20px; }
@@ -29,16 +29,17 @@
         .btn-ticket { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--blue), #0056cc); color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 20px rgba(10,124,255,0.2); }
         .btn-ticket:disabled { background: var(--gray); cursor: not-allowed; opacity: 0.5; box-shadow: none; }
         
-        /* BOUTON ROUGE ET FIXE */
         .btn-cancel { background: var(--red) !important; color: white !important; font-size: 16px; font-weight: 900; padding: 14px; border: none; border-radius: 12px; cursor: pointer; margin-top: 15px; width: 100%; display: none; text-transform: uppercase; }
         .btn-confirm-presence { background: var(--green) !important; color: #071126 !important; font-size: 16px; font-weight: 900; padding: 14px; border: none; border-radius: 12px; cursor: pointer; margin-top: 10px; width: 100%; display: none; text-transform: uppercase; }
         
         .your-ticket-box { background: var(--white); color: #000; padding: 25px; border-radius: 20px; text-align: center; margin-top: 25px; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
         .your-ticket-box .ticket-title { font-weight: 900; font-size: 18px; color: #071126; }
-        .your-ticket-number { font-size: 64px; font-weight: 900; color: var(--blue); margin: 10px 0; line-height: 1; }
+        .your-ticket-number { font-size: 64px; font-weight: 900; color: var(--blue); margin: 5px 0; line-height: 1; }
         .your-ticket-name { font-size: 18px; font-weight: 700; color: #1e293b; }
         .your-ticket-whatsapp { font-size: 14px; color: #64748b; margin-top: 4px; font-weight: 600; }
         .your-ticket-date { font-size: 13px; color: #475569; margin-top: 15px; border-top: 1px dashed #e2e8f0; padding-top: 12px; font-weight: 700; text-transform: capitalize; background: #f8fafc; padding: 10px; border-radius: 8px; }
+        
+        .status-badge { margin: 15px auto; padding: 10px 20px; border-radius: 12px; font-size: 15px; font-weight: 800; width: fit-content; text-transform: uppercase; display: block; }
         .qr-container { display: flex; justify-content: center; margin: 15px auto 0; padding: 8px; background: white; border-radius: 12px; width: fit-content; border: 1px solid #e2e8f0; }
         
         .display-board { display: flex; flex-direction: column; gap: 20px; }
@@ -52,7 +53,10 @@
         .waiting-list-section { background: var(--card-bg); border-radius: 24px; padding: 25px; }
         .waiting-tokens { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
         .token { background: rgba(255,255,255,0.05); padding: 10px 18px; border-radius: 12px; font-size: 15px; font-weight: 700; color: var(--accent); }
+        
+        /* ALERTES */
         .limit-alert { background: rgba(255,59,48,0.1); border: 1px solid var(--red); color: var(--red); padding: 12px; border-radius: 12px; font-size: 14px; text-align: center; margin-bottom: 15px; display: none; }
+        .dupe-alert { background: rgba(255, 149, 0, 0.12); border: 1px solid var(--orange); color: var(--orange); padding: 14px; border-radius: 14px; font-size: 14px; text-align: center; margin-bottom: 20px; display: none; font-weight: 600; line-height: 1.4; }
         
         .btn-reset-form { width: 100%; padding: 12px; background: rgba(7,17,38,0.4); color: var(--gray); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 15px; display: none; }
 
@@ -68,9 +72,13 @@
 <div class="grid-layout">
     <div class="panel">
         <div id="formSection">
-            <div style="font-size:18px; font-weight:800; margin-bottom:20px;">🎟️ Prendre un Ticket</div>
+            <div style="font-size:18px; font-weight:800; margin-bottom:20px;">🎟️ Prendre un Ticket / Suivi</div>
             <div class="limit-alert" id="limitAlert">⚠️ Limite quotidienne atteinte pour aujourd'hui.</div>
-            <form id="ticketForm" onsubmit="genererTicket(event)">
+            
+            <!-- BOITE DE SIGNALEMENT DE DOUBLON POUR LE PATIENT -->
+            <div class="dupe-alert" id="dupeAlert"></div>
+
+            <form id="ticketForm" onsubmit="validerEtGenerer(event)">
                 <div class="form-group">
                     <label>Nom complet du Patient</label>
                     <input type="text" id="clientName" placeholder="Ex: Mouhamed Karaboily" required>
@@ -79,7 +87,7 @@
                     <label>Numéro WhatsApp</label>
                     <input type="tel" id="clientWhatsapp" placeholder="Ex: +225 XX XX XX XX" required>
                 </div>
-                <button type="submit" id="btnSubmitTicket" class="btn-ticket">Prendre un Ticket</button>
+                <button type="submit" id="btnSubmitTicket" class="btn-ticket">Prendre un Ticket / Suivi</button>
             </form>
         </div>
 
@@ -89,14 +97,16 @@
             <div class="your-ticket-number" id="lblMyTicket">--</div>
             <div class="your-ticket-name" id="lblMyName">--</div>
             <div class="your-ticket-whatsapp" id="lblMyWhatsapp">--</div>
+            
+            <div id="lblMyStatusBadge" class="status-badge">⏳ Analyse du statut...</div>
+            
             <div class="your-ticket-date" id="lblMyDate">--</div>
             <div class="qr-container" id="qrcode"></div>
         </div>
         
-        <!-- BOUTONS DE CONTRÔLE SÉPARÉS -->
         <button class="btn-cancel" id="btnCancelPresence" onclick="annulerPresence()">❌ Annule ma présence</button>
         <button class="btn-confirm-presence" id="btnConfirmPresence" onclick="confirmerArrivee()">✅ Confirmer ma présence au Guichet</button>
-        <button class="btn-reset-form" id="btnResetForm" onclick="retourFormulaire()">Prendre un autre ticket</button>
+        <button class="btn-reset-form" id="btnResetForm" onclick="retourFormulaire()">Retour au formulaire</button>
     </div>
 
     <div class="display-board">
@@ -140,6 +150,12 @@
     let limiteTickets = 50;
     let monNumeroAffiche = null;
     let ticketCleCourante = null;
+    let statusListenerRef = null;
+    let autoriserDoublonsAdmin = false;
+
+    db.ref('file_attente/config_global/autoriser_doublons').on('value', snap => {
+        autoriserDoublonsAdmin = snap.val() === true;
+    });
 
     db.ref('file_attente/config_global/limite_globale').on('value', snap => {
         if(snap.exists()) { limiteTickets = parseInt(snap.val()); }
@@ -209,12 +225,50 @@
         }
     }
 
-    function genererTicket(e) {
+    // VÉRIFICATION DYNAMIQUE ET SIGNALEMENT DU PATIENT EXISTANT
+    function validerEtGenerer(e) {
         e.preventDefault();
-        if(totalTicketsCree >= limiteTickets) return;
+        const nomInput = document.getElementById("clientName").value.trim();
+        const whatsappInput = document.getElementById("clientWhatsapp").value.trim();
+        const dupeBox = document.getElementById("dupeAlert");
         
-        const nom = document.getElementById("clientName").value.trim();
-        const whatsapp = document.getElementById("clientWhatsapp").value.trim();
+        dupeBox.style.display = "none"; // Cache l'ancienne alerte
+
+        db.ref(`file_attente/historique_jours/${dStr}/tickets`).once('value', snap => {
+            let ticketTrouve = null;
+            let cleTrouvee = null;
+
+            snap.forEach(child => {
+                const tData = child.val();
+                // Le doublon est vérifié sur le Nom ET le Numéro WhatsApp simultanément
+                if (tData.whatsapp === whatsappInput && tData.nom.toLowerCase() === nomInput.toLowerCase() && tData.statut !== "Terminé") {
+                    ticketTrouve = tData;
+                    cleTrouvee = child.key;
+                }
+            });
+
+            if (ticketTrouve && !autoriserDoublonsAdmin) {
+                // SIGNALEMENT À L'ÉCRAN : L'administration refuse les doublons
+                dupeBox.innerHTML = `⚠️ <strong>Patient déjà inscrit !</strong><br>Vous possédez déjà le ticket <strong>${ticketTrouve.numero}</strong> pour aujourd'hui. Redirection vers votre suivi...`;
+                dupeBox.style.display = "block";
+
+                // Petit délai de 2,5 secondes pour lui laisser le temps de lire l'alerte avant d'afficher son ticket
+                setTimeout(() => {
+                    dupeBox.style.display = "none";
+                    ticketCleCourante = cleTrouvee;
+                    monNumeroAffiche = ticketTrouve.numero;
+                    afficherEcranTicket(ticketTrouve.nom, ticketTrouve.whatsapp, ticketTrouve.numero, ticketTrouve.heure_arrivee);
+                }, 2500);
+
+            } else {
+                // Si l'admin l'autorise ou que c'est un nouveau patient -> Nouveau ticket direct
+                creerNouveauTicket(nomInput, whatsappInput);
+            }
+        });
+    }
+
+    function creerNouveauTicket(nom, whatsapp) {
+        if(totalTicketsCree >= limiteTickets) return;
         
         const d = new Date();
         const heureArrivee = String(d.getHours()).padStart(2, '0') + "h" + String(d.getMinutes()).padStart(2, '0');
@@ -238,37 +292,69 @@
 
                 db.ref(`file_attente/historique_jours/${dStr}/tickets`).push(structureTicket).then(res => {
                     ticketCleCourante = res.key;
-                    
-                    document.getElementById("formSection").style.display = "none";
-                    document.getElementById("ticketResult").style.display = "block";
-                    document.getElementById("btnCancelPresence").style.display = "block";
-                    document.getElementById("btnResetForm").style.display = "block";
-                    
-                    document.getElementById("lblMyTicket").textContent = monNumeroAffiche;
-                    document.getElementById("lblMyName").textContent = nom;
-                    document.getElementById("lblMyWhatsapp").textContent = "WhatsApp : " + whatsapp;
-                    
-                    const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-                    const dateLegible = d.toLocaleDateString('fr-FR', options);
-                    document.getElementById("lblMyDate").textContent = `📆 ${dateLegible} à ${heureArrivee}`;
-                    
-                    document.getElementById("qrcode").innerHTML = "";
-                    new QRCode(document.getElementById("qrcode"), { 
-                        text: "MOUHAMED TECH\nTicket: " + monNumeroAffiche + "\nPatient: " + nom + "\nWA: " + whatsapp, 
-                        width: 120, 
-                        height: 120 
-                    });
-                    
-                    db.ref(`file_attente/historique_jours/${dStr}/tickets/${ticketCleCourante}/statut`).on('value', s => {
-                        const currentStatus = s.val();
-                        if(currentStatus === "Appelé") {
-                            document.getElementById("btnConfirmPresence").style.display = "block";
-                        } else if(currentStatus === "Patient Présent" || currentStatus === "Confirmé" || currentStatus === "Terminé" || currentStatus === "Absent") {
-                            document.getElementById("btnConfirmPresence").style.display = "none";
-                            document.getElementById("btnCancelPresence").style.display = "none";
-                        }
-                    });
+                    afficherEcranTicket(nom, whatsapp, monNumeroAffiche, heureArrivee);
                 });
+            }
+        });
+    }
+
+    function afficherEcranTicket(nom, whatsapp, numero, heure) {
+        document.getElementById("formSection").style.display = "none";
+        document.getElementById("ticketResult").style.display = "block";
+        document.getElementById("btnCancelPresence").style.display = "block";
+        document.getElementById("btnResetForm").style.display = "block";
+        
+        document.getElementById("lblMyTicket").textContent = numero;
+        document.getElementById("lblMyName").textContent = nom;
+        document.getElementById("lblMyWhatsapp").textContent = "WhatsApp : " + whatsapp;
+        
+        const d = new Date();
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        const dateLegible = d.toLocaleDateString('fr-FR', options);
+        document.getElementById("lblMyDate").textContent = `📆 ${dateLegible} à ${heure}`;
+        
+        document.getElementById("qrcode").innerHTML = "";
+        const lienSuiviTV = "https://mouhamedkaraboily.github.io/mouhamed-tech/tv.html?ticket=" + encodeURIComponent(numero);
+
+        new QRCode(document.getElementById("qrcode"), { 
+            text: lienSuiviTV, 
+            width: 120, 
+            height: 120 
+        });
+        
+        if(statusListenerRef) statusListenerRef.off();
+
+        statusListenerRef = db.ref(`file_attente/historique_jours/${dStr}/tickets/${ticketCleCourante}/statut`);
+        statusListenerRef.on('value', s => {
+            const currentStatus = s.val();
+            const badge = document.getElementById("lblMyStatusBadge");
+
+            if(currentStatus === "En attente") {
+                badge.style.background = "rgba(255, 149, 0, 0.15)";
+                badge.style.color = "var(--orange)";
+                badge.textContent = "⏳ Pas encore appelé (En attente...)";
+                document.getElementById("btnConfirmPresence").style.display = "none";
+                document.getElementById("btnCancelPresence").style.display = "block";
+            } 
+            else if(currentStatus === "Appelé") {
+                badge.style.background = "rgba(0, 217, 126, 0.15)";
+                badge.style.color = "var(--green)";
+                
+                db.ref(`file_attente/historique_jours/${dStr}/tickets/${ticketCleCourante}/guichet`).once('value', gSnap => {
+                    const guichetNum = gSnap.val() || "--";
+                    badge.innerHTML = `📢 C'EST VOTRE TOUR !<br><span style="font-size:13px;">Présentez-vous au GUICHET 0${guichetNum}</span>`;
+                });
+                
+                document.getElementById("btnConfirmPresence").style.display = "block";
+                document.getElementById("btnCancelPresence").style.display = "none";
+            } 
+            else if(currentStatus === "Patient Présent" || currentStatus === "Confirmé" || currentStatus === "Terminé" || currentStatus === "Absent") {
+                badge.style.background = "rgba(10, 124, 255, 0.15)";
+                badge.style.color = "var(--blue)";
+                badge.textContent = currentStatus === "Absent" ? "❌ Signalé Absent" : "✅ Traitement en cours / Terminé";
+                
+                document.getElementById("btnConfirmPresence").style.display = "none";
+                document.getElementById("btnCancelPresence").style.display = "none";
             }
         });
     }
@@ -292,8 +378,10 @@
     }
 
     function retourFormulaire() {
+        if(statusListenerRef) statusListenerRef.off();
         document.getElementById("clientName").value = "";
         document.getElementById("clientWhatsapp").value = "";
+        document.getElementById("dupeAlert").style.display = "none";
         document.getElementById("ticketResult").style.display = "none";
         document.getElementById("btnConfirmPresence").style.display = "none";
         document.getElementById("btnCancelPresence").style.display = "none";
