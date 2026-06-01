@@ -57,6 +57,9 @@
         .config-row input { width: 80px; padding: 8px; background: var(--dark-gray); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; text-align: center; font-weight: 700; outline: none; }
         .config-row input:focus { border-color: var(--blue); }
         
+        .switch-label { font-weight: 600; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; color: var(--white); }
+        .switch-label input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--blue); }
+        
         .stat-number { font-size: 28px; font-weight: 900; }
 
         .btn-validate-limit { background: var(--green); color: #030a16; font-size: 13px; padding: 8px 14px; border-radius: 8px; font-weight: 700; width: auto; margin-left: 10px; display: inline-flex; align-items: center; }
@@ -79,7 +82,6 @@
 </head>
 <body>
 
-<!-- ECRAN MOT DE PASSE -->
 <div id="passwordScreen" style="position:fixed;inset:0;background:#030a16;z-index:9999;display:flex;align-items:center;justify-content:center;">
   <div style="background:#0a1526;border:1px solid rgba(0,229,255,0.15);border-radius:24px;padding:48px 40px;width:100%;max-width:400px;text-align:center;box-shadow:0 0 60px rgba(0,229,255,0.08);">
     <div style="font-size:48px;margin-bottom:16px;">&#128274;</div>
@@ -102,7 +104,8 @@
 function checkPwd(){
   var v=document.getElementById("pwdInput").value;
   var err=document.getElementById("pwdError");
-  if(v==="hamed kara"){
+  // CORRIGÉ : Nettoyage de la condition de vérification
+  if(v === "hamed kara"){
     document.getElementById("passwordScreen").style.display="none";
     err.style.display="none";
   } else {
@@ -122,7 +125,6 @@ function checkPwd(){
 <div class="dashboard-grid">
     <div class="panel">
         <div class="panel-title">🕹️ Guichet de Travail</div>
-        <!-- CHANGEMENT : Initialisé à "none" pour forcer un choix conscient -->
         <select class="select-box" id="selectGuichetActif" onchange="demanderConfirmationGuichet(this.value)">
             <option value="none">-- Choisissez un guichet disponible --</option>
             <option value="1">Travailler sur le GUICHET 01</option>
@@ -136,12 +138,10 @@ function checkPwd(){
             ⚠️ Ce guichet est déjà occupé par un autre administrateur. Veuillez en choisir un autre.
         </div>
 
-        <!-- CHANGEMENT : Message informatif affiché par défaut -->
         <div class="info-select-msg" id="infoSelectMessage">
             📌 Veuillez sélectionner et confirmer un guichet ci-dessus pour accéder aux commandes d'appel.
         </div>
 
-        <!-- Le bloc des commandes est caché par défaut au démarrage -->
         <div class="control-card" id="controlCardBox" style="display: none;">
             <div class="current-status-display" id="txtStatutActuel">Statut : Libre</div>
             <div class="current-ticket-display" id="txtTicketActuel">—</div>
@@ -170,6 +170,13 @@ function checkPwd(){
                 <input type="number" id="inputLimit" min="1" placeholder="Ex: 50">
                 <button class="btn-validate-limit" onclick="validerNouvelleLimite()">💾 Valider</button>
             </div>
+        </div>
+
+        <div class="config-row" style="margin-top: 15px; margin-bottom: 15px;">
+            <label class="switch-label">
+                <input type="checkbox" id="chkAllowDupes" onchange="toggleDoublons(this.checked)">
+                Autoriser les doublons (Nom + Numéro)
+            </label>
         </div>
 
         <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 15px 0;">
@@ -246,7 +253,17 @@ function checkPwd(){
 
     let guichetSelectionne = "none";
     let referenceEcouteGuichet = null;
-    let cacheGuichetsStatut = {}; // Pour stocker en temps réel l'état d'occupation avant confirmation
+    let cacheGuichetsStatut = {};
+
+    db.ref('file_attente/config_global/autoriser_doublons').on('value', snap => {
+        document.getElementById("chkAllowDupes").checked = snap.val() === true;
+    });
+
+    function toggleDoublons(isAllowed) {
+        db.ref('file_attente/config_global').update({
+            autoriser_doublons: isAllowed
+        }).catch(err => alert("Erreur de mise à jour : " + err.message));
+    }
 
     db.ref('file_attente/config_global/limite_globale').on('value', snap => {
         if(snap.exists()) {
@@ -276,7 +293,6 @@ function checkPwd(){
         });
     }
 
-    // NOUVELLE FONCTION : Gestion de la double confirmation sécurisée
     function demanderConfirmationGuichet(numGuichet) {
         if (numGuichet === "none") {
             quitterGuichetPrecedent(guichetSelectionne);
@@ -288,7 +304,6 @@ function checkPwd(){
             return;
         }
 
-        // Vérification préalable si occupé par un collègue
         let currentAdmin = cacheGuichetsStatut[`guichet_${numGuichet}`]?.session_admin || "";
         if (currentAdmin !== "" && currentAdmin !== monIdSessionAdmin) {
             alert(`⛔ Impossible : Le GUICHET 0${numGuichet} est actuellement occupé par un autre administrateur.`);
@@ -296,14 +311,11 @@ function checkPwd(){
             return;
         }
 
-        // Fenêtre de confirmation
         let confirmation = confirm(`📥 Confirmez-vous l'ouverture et la prise de contrôle du GUICHET 0${numGuichet} ?`);
         
         if (confirmation) {
-            // L'utilisateur accepte -> basculement sur le guichet
             changerGuichetEcoute(numGuichet);
         } else {
-            // L'utilisateur refuse -> on remet le menu déroulant sur son ancienne valeur
             document.getElementById("selectGuichetActif").value = guichetSelectionne;
         }
     }
@@ -349,7 +361,7 @@ function checkPwd(){
 
     db.ref('file_attente/guichets').on('value', snap => {
         const data = snap.val() || {};
-        cacheGuichetsStatut = data; // Mise à jour de la mémoire tampon locale
+        cacheGuichetsStatut = data;
         const grid = document.getElementById("miniStatusGrid");
         grid.innerHTML = "";
         
@@ -412,7 +424,6 @@ function checkPwd(){
                         <td><button class="btn-re-call-absent" id="btnRecallAbsent_${t.numero}" onclick="reengagerAbsent('${t.numero}', '${t.nom.replace(/'/g, "\\'")}')">📢 Rappeler au G${guichetSelectionne === 'none' ? '?' : '0'+guichetSelectionne}</button></td>
                     </tr>
                 `;
-                // Désactiver le rappel d'absents si aucun guichet n'est ouvert
                 if (guichetSelectionne === "none") {
                     setTimeout(() => { document.getElementById(`btnRecallAbsent_${t.numero}`).disabled = true; }, 10);
                 }
@@ -496,7 +507,6 @@ function checkPwd(){
                 session_admin: ""
             }).then(() => {
                 alert(`✅ Guichet 0${guichetSelectionne} libéré avec succès.`);
-                // Réinitialisation de l'affichage sur Aucun guichet après fermeture
                 document.getElementById("selectGuichetActif").value = "none";
                 demanderConfirmationGuichet("none");
             });
