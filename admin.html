@@ -25,10 +25,13 @@
         .select-box { width: 100%; padding: 14px; background: var(--dark-gray); border: 2px solid var(--blue); border-radius: 12px; color: white; font-size: 16px; font-weight: 700; outline: none; margin-bottom: 20px; }
 
         .error-locked-msg { background: rgba(255, 59, 48, 0.15); border: 1px solid var(--red); color: #ff6b63; border-radius: 12px; padding: 15px; font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 15px; display: none; }
+        .info-select-msg { background: rgba(10, 124, 255, 0.1); border: 1px solid var(--blue); color: #7cb7ff; border-radius: 12px; padding: 20px; font-size: 15px; font-weight: 700; text-align: center; }
 
         .control-card { background: var(--dark-gray); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
         .current-status-display { font-size: 14px; color: var(--gray); font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
-        .current-ticket-display { font-size: 48px; font-weight: 900; color: var(--accent); margin-bottom: 15px; }
+        
+        .current-ticket-display { font-size: 64px; font-weight: 900; color: var(--accent); margin-bottom: 15px; letter-spacing: 2px; }
+        .current-name-display { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 15px; opacity: 0.9; }
 
         .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         button { padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
@@ -37,23 +40,25 @@
         .btn-call:hover:not(:disabled) { background: #0066de; }
         .btn-recall { background: var(--orange); color: white; }
         .btn-recall:hover:not(:disabled) { background: #e08200; }
-        .btn-release { background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-release:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+        .btn-release { background: rgba(255,255,255, 0.08); color: white; border: 1px solid rgba(255,255,255,0.15); }
+        .btn-release:hover:not(:disabled) { background: rgba(255,255,255,0.15); }
 
-        /* Nouveaux boutons et badges pour les Absents */
         .btn-absent { background: #551a8b; color: white; }
         .btn-absent:hover:not(:disabled) { background: #40106a; }
         .btn-re-call-absent { background: var(--accent); color: #030a16; font-size: 12px; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; }
         .btn-re-call-absent:hover { opacity: 0.9; }
 
         .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
-        .mini-card { background: var(--dark-gray); padding: 15px; border-radius: 12px; text-align: center; font-size: 14px; border: 1px solid transparent; }
-        .mini-card.occupied { border-color: var(--red); background: rgba(255, 59, 48, 0.02); }
+        .mini-card { background: var(--dark-gray); padding: 15px; border-radius: 12px; text-align: center; font-size: 14px; border: 2px solid transparent; }
+        .mini-card.occupied { border-color: var(--red); background: rgba(255, 59, 48, 0.15); }
         .mini-card strong { display: block; font-size: 20px; color: var(--accent); margin-top: 5px; }
 
-        .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 15px; }
+        .config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 16px; }
         .config-row input { width: 80px; padding: 8px; background: var(--dark-gray); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; text-align: center; font-weight: 700; outline: none; }
         .config-row input:focus { border-color: var(--blue); }
+        
+        .stat-number { font-size: 28px; font-weight: 900; }
+
         .btn-validate-limit { background: var(--green); color: #030a16; font-size: 13px; padding: 8px 14px; border-radius: 8px; font-weight: 700; width: auto; margin-left: 10px; display: inline-flex; align-items: center; }
         .btn-validate-limit:hover { opacity: 0.9; }
         .btn-danger { background: var(--red); color: white; width: 100%; margin-top: 15px; }
@@ -74,12 +79,12 @@
 </head>
 <body>
 
-    <!-- ECRAN MOT DE PASSE -->
+<!-- ECRAN MOT DE PASSE -->
 <div id="passwordScreen" style="position:fixed;inset:0;background:#030a16;z-index:9999;display:flex;align-items:center;justify-content:center;">
   <div style="background:#0a1526;border:1px solid rgba(0,229,255,0.15);border-radius:24px;padding:48px 40px;width:100%;max-width:400px;text-align:center;box-shadow:0 0 60px rgba(0,229,255,0.08);">
     <div style="font-size:48px;margin-bottom:16px;">&#128274;</div>
     <h2 style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;">Espace Administrateur</h2>
-    <p style="color:#64748b;font-size:14px;margin-bottom:28px;">Entrez le mot de passe pour acceder</p>
+    <p style="color:#64748b;font-size:14px;margin-bottom:28px;">Entrez le mot de passe pour accéder</p>
     <input type="password" id="pwdInput" placeholder="Mot de passe..."
       onkeydown="if(event.key==='Enter')checkPwd()"
       style="width:100%;padding:14px 18px;background:#1e293b;border:2px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;font-size:16px;font-family:'Outfit',sans-serif;outline:none;margin-bottom:12px;transition:border .2s;"
@@ -88,10 +93,11 @@
     <button onclick="checkPwd()"
       style="width:100%;padding:14px;background:linear-gradient(135deg,#0a7cff,#0056cc);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:800;font-family:'Outfit',sans-serif;cursor:pointer;transition:transform .2s;"
       onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-      Acceder &#8594;
+      Accéder &#8594;
     </button>
   </div>
 </div>
+
 <script>
 function checkPwd(){
   var v=document.getElementById("pwdInput").value;
@@ -107,6 +113,7 @@ function checkPwd(){
   }
 }
 </script>
+
 <header>
     <h1>MOUHAMED<span>TECH</span> — Espace Admin</h1>
     <div class="admin-clock" id="adminClock">Chargement du calendrier...</div>
@@ -115,7 +122,9 @@ function checkPwd(){
 <div class="dashboard-grid">
     <div class="panel">
         <div class="panel-title">🕹️ Guichet de Travail</div>
-        <select class="select-box" id="selectGuichetActif" onchange="changerGuichetEcoute(this.value)">
+        <!-- CHANGEMENT : Initialisé à "none" pour forcer un choix conscient -->
+        <select class="select-box" id="selectGuichetActif" onchange="demanderConfirmationGuichet(this.value)">
+            <option value="none">-- Choisissez un guichet disponible --</option>
             <option value="1">Travailler sur le GUICHET 01</option>
             <option value="2">Travailler sur le GUICHET 02</option>
             <option value="3">Travailler sur le GUICHET 03</option>
@@ -127,9 +136,16 @@ function checkPwd(){
             ⚠️ Ce guichet est déjà occupé par un autre administrateur. Veuillez en choisir un autre.
         </div>
 
-        <div class="control-card">
+        <!-- CHANGEMENT : Message informatif affiché par défaut -->
+        <div class="info-select-msg" id="infoSelectMessage">
+            📌 Veuillez sélectionner et confirmer un guichet ci-dessus pour accéder aux commandes d'appel.
+        </div>
+
+        <!-- Le bloc des commandes est caché par défaut au démarrage -->
+        <div class="control-card" id="controlCardBox" style="display: none;">
             <div class="current-status-display" id="txtStatutActuel">Statut : Libre</div>
             <div class="current-ticket-display" id="txtTicketActuel">—</div>
+            <div class="current-name-display" id="txtNomActuel"></div>
             
             <div class="grid-buttons">
                 <button class="btn-call" id="btnAdminCall" onclick="appelerPatientSuivant()">📢 Appeler le Suivant</button>
@@ -157,14 +173,13 @@ function checkPwd(){
         </div>
 
         <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 15px 0;">
-        <div class="config-row"><span>Total Inscrits :</span><strong id="statTotal" style="color:var(--accent);">0</strong></div>
-        <div class="config-row"><span>En Attente :</span><strong id="statAttente" style="color:var(--blue);">0</strong></div>
+        <div class="config-row"><span>Total Inscrits :</span><strong class="stat-number" id="statTotal" style="color:var(--blue);">0</strong></div>
+        <div class="config-row"><span>En Attente :</span><strong class="stat-number" id="statAttente" style="color:var(--accent);">0</strong></div>
         
         <button class="btn-danger" onclick="reinitialiserFileAttente()">🔄 Vider la file d'aujourd'hui</button>
     </div>
 </div>
 
-<!-- NOUVEAU : Liste autonome des patients absents -->
 <div class="panel" style="margin-bottom: 25px;">
     <div class="panel-title" style="color: var(--orange);">⏱️ Patients Absents (Rappel Possible)</div>
     <div class="table-container">
@@ -229,8 +244,9 @@ function checkPwd(){
     }
     const dStr = getTodayDateStr();
 
-    let guichetSelectionne = 1;
+    let guichetSelectionne = "none";
     let referenceEcouteGuichet = null;
+    let cacheGuichetsStatut = {}; // Pour stocker en temps réel l'état d'occupation avant confirmation
 
     db.ref('file_attente/config_global/limite_globale').on('value', snap => {
         if(snap.exists()) {
@@ -244,35 +260,69 @@ function checkPwd(){
             db.ref('file_attente/config_global').update({ 
                 limite_globale: parseInt(inputVal) 
             }).then(() => {
-                alert(`🎯 Limite de clients mise à jour avec succès : ${inputVal} max.`);
+                alert(`🎯 Limite de clients mise à jour : ${inputVal} max.`);
             }).catch((err) => {
-                alert("Erreur lors de l'enregistrement : " + err.message);
+                alert("Erreur : " + err.message);
             });
-        } else {
-            alert("Veuillez saisir un nombre valide de clients supérieur à 0.");
         }
     }
 
     function quitterGuichetPrecedent(idGuichet) {
+        if(idGuichet === "none") return;
         db.ref(`file_attente/guichets/guichet_${idGuichet}/session_admin`).once('value', snap => {
             if(snap.val() === monIdSessionAdmin) {
-                db.ref(`file_attente/guichets/guichet_${idGuichet}/session_admin`).remove();
+                db.ref(`file_attente/guichets/guichet_${idGuichet}/session_admin`).set("");
             }
         });
     }
 
+    // NOUVELLE FONCTION : Gestion de la double confirmation sécurisée
+    function demanderConfirmationGuichet(numGuichet) {
+        if (numGuichet === "none") {
+            quitterGuichetPrecedent(guichetSelectionne);
+            guichetSelectionne = "none";
+            if(referenceEcouteGuichet) referenceEcouteGuichet.off();
+            document.getElementById("controlCardBox").style.display = "none";
+            document.getElementById("infoSelectMessage").style.display = "block";
+            document.getElementById("lockMessage").style.display = "none";
+            return;
+        }
+
+        // Vérification préalable si occupé par un collègue
+        let currentAdmin = cacheGuichetsStatut[`guichet_${numGuichet}`]?.session_admin || "";
+        if (currentAdmin !== "" && currentAdmin !== monIdSessionAdmin) {
+            alert(`⛔ Impossible : Le GUICHET 0${numGuichet} est actuellement occupé par un autre administrateur.`);
+            document.getElementById("selectGuichetActif").value = guichetSelectionne;
+            return;
+        }
+
+        // Fenêtre de confirmation
+        let confirmation = confirm(`📥 Confirmez-vous l'ouverture et la prise de contrôle du GUICHET 0${numGuichet} ?`);
+        
+        if (confirmation) {
+            // L'utilisateur accepte -> basculement sur le guichet
+            changerGuichetEcoute(numGuichet);
+        } else {
+            // L'utilisateur refuse -> on remet le menu déroulant sur son ancienne valeur
+            document.getElementById("selectGuichetActif").value = guichetSelectionne;
+        }
+    }
+
     function changerGuichetEcoute(numGuichet) {
         quitterGuichetPrecedent(guichetSelectionne);
-        
         guichetSelectionne = parseInt(numGuichet);
         if(referenceEcouteGuichet) referenceEcouteGuichet.off();
         
+        document.getElementById("infoSelectMessage").style.display = "none";
+        document.getElementById("controlCardBox").style.display = "block";
+
         referenceEcouteGuichet = db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`);
         referenceEcouteGuichet.on('value', snap => {
-            const gData = snap.val() || { statut: "Libre", ticket: "Libre", session_admin: "" };
+            const gData = snap.val() || { statut: "Libre", ticket: "Libre", nom: "", session_admin: "" };
             
             document.getElementById("txtStatutActuel").textContent = `Statut : ${gData.statut}`;
             document.getElementById("txtTicketActuel").textContent = (gData.ticket === "Libre") ? "—" : gData.ticket;
+            document.getElementById("txtNomActuel").textContent = (gData.nom && gData.ticket !== "Libre") ? gData.nom : "";
 
             const msgVerrou = document.getElementById("lockMessage");
             const btnCall = document.getElementById("btnAdminCall");
@@ -282,16 +332,11 @@ function checkPwd(){
 
             if(gData.session_admin && gData.session_admin !== monIdSessionAdmin) {
                 msgVerrou.style.display = "block";
-                btnCall.disabled = true;
-                btnRecall.disabled = true;
-                btnRelease.disabled = true;
-                btnAbsent.disabled = true;
+                document.getElementById("controlCardBox").style.display = "none";
             } else {
                 msgVerrou.style.display = "none";
-                btnCall.disabled = false;
-                btnRecall.disabled = false;
-                btnRelease.disabled = false;
-                btnAbsent.disabled = false;
+                document.getElementById("controlCardBox").style.display = "block";
+                btnCall.disabled = false; btnRecall.disabled = false; btnRelease.disabled = false; btnAbsent.disabled = false;
 
                 if(!gData.session_admin) {
                     db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({ session_admin: monIdSessionAdmin });
@@ -304,6 +349,7 @@ function checkPwd(){
 
     db.ref('file_attente/guichets').on('value', snap => {
         const data = snap.val() || {};
+        cacheGuichetsStatut = data; // Mise à jour de la mémoire tampon locale
         const grid = document.getElementById("miniStatusGrid");
         grid.innerHTML = "";
         
@@ -312,12 +358,12 @@ function checkPwd(){
             let tAffiche = (g.ticket === "Libre") ? "—" : g.ticket;
             
             let isOccupied = (g.session_admin && g.session_admin !== monIdSessionAdmin) ? "occupied" : "";
-            let infoAdminText = isOccupied ? "<div style='color:var(--red);font-weight:700;'>Bloqué (Admin)</div>" : `<div style="font-size:11px; color:var(--gray); margin-top:4px;">${g.statut}</div>`;
+            let infoAdminText = isOccupied ? "<div style='color:#ffffff; font-weight:800; font-size:12px; margin-top:4px;'>OCCUPÉ</div>" : `<div style="font-size:11px; color:var(--green); font-weight:800; margin-top:4px;">${g.statut.toUpperCase()}</div>`;
 
             grid.innerHTML += `
-                <div class="mini-card ${isOccupied}">
-                    <div>G0${i}</div>
-                    <strong>${tAffiche}</strong>
+                <div class="mini-card ${isOccupied}" style="background: ${isOccupied ? 'var(--red)' : 'var(--dark-gray)'}; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">
+                    <div style="font-weight:800; font-size:12px; color:${isOccupied ? '#ffffff' : 'var(--gray)'}">GUICHET 0${i}</div>
+                    <strong style="color:#ffffff; font-size:24px;">${tAffiche}</strong>
                     ${infoAdminText}
                 </div>
             `;
@@ -327,9 +373,7 @@ function checkPwd(){
     db.ref(`file_attente/historique_jours/${dStr}/tickets`).on('value', snap => {
         const tbody = document.getElementById("adminTableBody");
         const tbodyAbsents = document.getElementById("absentsTableBody");
-        
-        tbody.innerHTML = "";
-        tbodyAbsents.innerHTML = "";
+        tbody.innerHTML = ""; tbodyAbsents.innerHTML = "";
         
         let total = 0, attente = 0, totalAbsents = 0;
         
@@ -348,7 +392,6 @@ function checkPwd(){
                 displayDate = String(dateInst.getHours()).padStart(2, '0') + "h" + String(dateInst.getMinutes()).padStart(2, '0');
             }
 
-            // Alimentation du tableau principal général
             tbody.innerHTML += `
                 <tr>
                     <td><strong>${t.numero}</strong></td>
@@ -360,21 +403,24 @@ function checkPwd(){
                 </tr>
             `;
 
-            // Alimentation du tableau autonome des absents
             if(t.statut === "Absent") {
                 totalAbsents++;
                 tbodyAbsents.innerHTML += `
                     <tr>
                         <td><strong style="color:var(--orange);">${t.numero}</strong></td>
                         <td>${t.nom}</td>
-                        <td><button class="btn-re-call-absent" onclick="reengagerAbsent('${t.numero}')">📢 Rappeler au G0${guichetSelectionne}</button></td>
+                        <td><button class="btn-re-call-absent" id="btnRecallAbsent_${t.numero}" onclick="reengagerAbsent('${t.numero}', '${t.nom.replace(/'/g, "\\'")}')">📢 Rappeler au G${guichetSelectionne === 'none' ? '?' : '0'+guichetSelectionne}</button></td>
                     </tr>
                 `;
+                // Désactiver le rappel d'absents si aucun guichet n'est ouvert
+                if (guichetSelectionne === "none") {
+                    setTimeout(() => { document.getElementById(`btnRecallAbsent_${t.numero}`).disabled = true; }, 10);
+                }
             }
         });
 
         if(totalAbsents === 0) {
-            tbodyAbsents.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--gray);">Aucun patient absent pour le moment.</td></tr>`;
+            tbodyAbsents.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--gray);">Aucun patient absent.</td></tr>`;
         }
 
         document.getElementById("statTotal").textContent = total;
@@ -382,34 +428,39 @@ function checkPwd(){
     });
 
     function appelerPatientSuivant() {
+        if(guichetSelectionne === "none") return;
         db.ref(`file_attente/historique_jours/${dStr}/tickets`).once('value', snap => {
             let prochainTicketKey = null;
             let prochainTicketNum = null;
+            let prochainTicketNom = "";
 
             snap.forEach(child => {
                 if(!prochainTicketKey && child.val().statut === "En attente") {
                     prochainTicketKey = child.key;
                     prochainTicketNum = child.val().numero;
+                    prochainTicketNom = child.val().nom;
                 }
             });
 
             if(prochainTicketKey) {
                 db.ref(`file_attente/historique_jours/${dStr}/tickets/${prochainTicketKey}`).update({
-                    statut: "Appelé",
-                    guichet: guichetSelectionne
+                    statut: "Appelé", guichet: guichetSelectionne
                 });
                 db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({
                     statut: "Appel en cours",
                     ticket: prochainTicketNum,
-                    force_vocal: Math.random() 
+                    nom: prochainTicketNom,
+                    force_vocal: Math.random(),
+                    date_action: Date.now()
                 });
             } else {
-                alert("Aucun patient en attente dans la file.");
+                alert("Aucun patient en attente.");
             }
         });
     }
 
     function rappelerMemePatient() {
+        if(guichetSelectionne === "none") return;
         db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).once('value', snap => {
             let currentTick = snap.val() ? snap.val().ticket : "Libre";
             let currentStatut = snap.val() ? snap.val().statut : "Libre";
@@ -417,31 +468,43 @@ function checkPwd(){
             if(currentTick !== "Libre" && currentStatut === "Appel en cours") {
                 db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({
                     statut: "Appel en cours",
-                    force_vocal: Math.random() 
+                    force_vocal: Math.random(),
+                    date_action: Date.now()
                 });
             } else {
-                alert("Aucun patient n'est actuellement en cours d'appel sur ce guichet.");
+                alert("Aucun patient en cours d'appel.");
             }
         });
     }
 
     function libererGuichetActif() {
+        if(guichetSelectionne === "none") return;
         db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).once('value', snap => {
             let tickNum = snap.val() ? snap.val().ticket : null;
+            
             if(tickNum && tickNum !== "Libre") {
                 db.ref(`file_attente/historique_jours/${dStr}/tickets`).orderByChild('numero').equalTo(tickNum).once('value', s => {
                     s.forEach(c => { c.ref.update({ statut: "Terminé" }); });
                 });
             }
+            
             db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({
-                statut: "Libre",
-                ticket: "Libre"
+                statut: "Libre", 
+                ticket: "Libre", 
+                nom: "", 
+                date_action: null,
+                session_admin: ""
+            }).then(() => {
+                alert(`✅ Guichet 0${guichetSelectionne} libéré avec succès.`);
+                // Réinitialisation de l'affichage sur Aucun guichet après fermeture
+                document.getElementById("selectGuichetActif").value = "none";
+                demanderConfirmationGuichet("none");
             });
         });
     }
 
-    // NOUVEAU : Fonction pour marquer le patient comme "Absent"
     function marquerPatientAbsent() {
+        if(guichetSelectionne === "none") return;
         db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).once('value', snap => {
             let tickNum = snap.val() ? snap.val().ticket : null;
             if(tickNum && tickNum !== "Libre") {
@@ -449,38 +512,39 @@ function checkPwd(){
                     s.forEach(c => { c.ref.update({ statut: "Absent" }); });
                 });
                 db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({
-                    statut: "Libre",
-                    ticket: "Libre"
+                    statut: "Libre", ticket: "Libre", nom: "", date_action: null
                 });
-            } else {
-                alert("Aucun patient n'est en cours d'appel sur ce guichet.");
             }
         });
     }
 
-    // NOUVEAU : Fonction pour rappeler un patient absent
-    function reengagerAbsent(numeroTicket) {
+    function reengagerAbsent(numeroTicket, nomTicket) {
+        if(guichetSelectionne === "none") {
+            alert("Veuillez d'abord choisir et valider un guichet actif.");
+            return;
+        }
         db.ref(`file_attente/historique_jours/${dStr}/tickets`).orderByChild('numero').equalTo(numeroTicket).once('value', s => {
             s.forEach(c => { c.ref.update({ statut: "Appelé", guichet: guichetSelectionne }); });
         });
-
         db.ref(`file_attente/guichets/guichet_${guichetSelectionne}`).update({
             statut: "Appel en cours",
             ticket: numeroTicket,
-            force_vocal: Math.random()
+            nom: nomTicket,
+            force_vocal: Math.random(),
+            date_action: Date.now()
         });
     }
 
     function reinitialiserFileAttente() {
-        if(confirm("⚠️ ATTENTION : Êtes-vous sûr de vouloir vider COMPLÈTEMENT la file d'attente d'aujourd'hui ?")) {
+        if(confirm("⚠️ ATTENTION : Cela supprimera TOUS les clients inscrits aujourd'hui. Voulez-vous continuer ?")) {
             db.ref(`file_attente/historique_jours/${dStr}`).remove();
             for(let i=1; i<=5; i++) {
-                db.ref(`file_attente/guichets/guichet_${i}`).set({ statut: "Libre", ticket: "Libre" });
+                db.ref(`file_attente/guichets/guichet_${i}`).set({ statut: "Libre", ticket: "Libre", nom: "", session_admin: "" });
             }
+            document.getElementById("selectGuichetActif").value = "none";
+            demanderConfirmationGuichet("none");
         }
     }
-
-    changerGuichetEcoute(1);
 </script>
 </body>
 </html>
