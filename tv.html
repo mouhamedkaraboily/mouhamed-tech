@@ -9,46 +9,243 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <style>
-        :root { --bg: #030a16; --card-bg: #0a1526; --blue: #0a7cff; --accent: #00e5ff; --green: #00d97e; --white: #ffffff; --gray: #64748b; --dark-gray: #1e293b; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background: var(--bg); color: var(--white); height: 100vh; overflow: hidden; display: flex; flex-direction: column; padding: 30px; }
+        :root { 
+            --bg: #030a16; 
+            --card-bg: #0a1526; 
+            --blue: #0a7cff; 
+            --accent: #00e5ff; 
+            --green: #00d97e; 
+            --white: #ffffff; 
+            --gray: #64748b; 
+            --dark-gray: #1e293b; 
+        }
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Outfit', sans-serif; 
+        }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--white); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 2vw; 
+            overflow-x: hidden;
+        }
 
-        header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 3px solid rgba(255, 255, 255, 0.05); margin-bottom: 30px; }
-        header h1 { font-size: 36px; font-weight: 900; letter-spacing: 1px; }
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding-bottom: 20px; 
+            border-bottom: 3px solid rgba(255, 255, 255, 0.05); 
+            margin-bottom: 30px; 
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        header h1 { 
+            font-size: clamp(1.8rem, 4vw, 2.3rem); 
+            font-weight: 900; 
+            letter-spacing: 1px; 
+        }
+        
         header h1 span { color: var(--accent); }
         
-        .tv-clock { font-size: 22px; font-weight: 800; color: var(--accent); background: rgba(0, 229, 255, 0.05); padding: 10px 25px; border-radius: 16px; border: 1px solid rgba(0, 229, 255, 0.1); text-transform: capitalize; }
+        .tv-clock { 
+            font-size: clamp(1rem, 2vw, 1.4rem); 
+            font-weight: 800; 
+            color: var(--accent); 
+            background: rgba(0, 229, 255, 0.05); 
+            padding: 10px 25px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(0, 229, 255, 0.1); 
+            text-transform: capitalize; 
+        }
 
-        .main-container { display: flex; gap: 40px; flex: 1; height: calc(100vh - 150px); }
+        .main-container { 
+            display: flex; 
+            gap: 30px; 
+            flex: 1; 
+            width: 100%;
+        }
 
         .priority-box {
-            flex: 1.2; background: radial-gradient(circle at top left, #0a1b3a, var(--card-bg)); border-radius: 32px; border: 2px solid rgba(0, 229, 255, 0.2); box-shadow: 0 0 50px rgba(0, 229, 255, 0.05);
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px; position: relative; animation: pulse-border 2s infinite alternate;
+            flex: 1.2; 
+            background: radial-gradient(circle at top left, #0a1b3a, var(--card-bg)); 
+            border-radius: 32px; 
+            border: 2px solid rgba(0, 229, 255, 0.2); 
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.05);
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 40px 20px; 
+            position: relative; 
+            animation: pulse-border 2s infinite alternate;
         }
-        @keyframes pulse-border { 0% { border-color: rgba(0, 229, 255, 0.2); } 100% { border-color: rgba(0, 229, 255, 0.6); } }
-
-        .priority-label { font-size: 24px; text-transform: uppercase; letter-spacing: 4px; color: var(--gray); font-weight: 800; margin-bottom: 10px; }
-        .priority-ticket { font-size: 140px; font-weight: 900; color: var(--accent); line-height: 1.1; text-shadow: 0 0 40px rgba(0, 229, 255, 0.3); }
-        .priority-patient-name { font-size: 38px; font-weight: 800; color: var(--white); margin-top: 5px; margin-bottom: 25px; letter-spacing: 1px; text-transform: capitalize; }
-        .priority-guichet { font-size: 46px; font-weight: 800; background: var(--blue); color: white; padding: 12px 40px; border-radius: 20px; box-shadow: 0 10px 20px rgba(10, 124, 255, 0.3); }
-
-        /* Conteneur de droite réorganisé */
-        .others-box { flex: 1; background: var(--card-bg); border-radius: 32px; border: 1px solid rgba(255, 255, 255, 0.05); padding: 35px; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; }
         
-        .section-group { display: flex; flex-direction: column; }
-        .others-title { font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--gray); margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px; }
+        @keyframes pulse-border { 
+            0% { border-color: rgba(0, 229, 255, 0.2); } 
+            100% { border-color: rgba(0, 229, 255, 0.6); } 
+        }
+
+        .priority-label { 
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem); 
+            text-transform: uppercase; 
+            letter-spacing: 4px; 
+            color: var(--gray); 
+            font-weight: 800; 
+            margin-bottom: 10px; 
+        }
+        
+        .priority-ticket { 
+            font-size: clamp(4.5rem, 12vw, 9rem); 
+            font-weight: 900; 
+            color: var(--accent); 
+            line-height: 1.1; 
+            text-shadow: 0 0 40px rgba(0, 229, 255, 0.3); 
+        }
+        
+        .priority-patient-name { 
+            font-size: clamp(1.5rem, 4vw, 2.4rem); 
+            font-weight: 800; 
+            color: var(--white); 
+            margin-top: 5px; 
+            margin-bottom: 25px; 
+            letter-spacing: 1px; 
+            text-transform: capitalize; 
+        }
+        
+        .priority-guichet { 
+            font-size: clamp(1.4rem, 3.5vw, 2.8rem); 
+            font-weight: 800; 
+            background: var(--blue); 
+            color: white; 
+            padding: 12px 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 20px rgba(10, 124, 255, 0.3); 
+        }
+
+        .others-box { 
+            flex: 1; 
+            background: var(--card-bg); 
+            border-radius: 32px; 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            padding: 30px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 25px; 
+        }
+        
+        .section-group { 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        .others-title { 
+            font-size: clamp(1.1rem, 2vw, 1.4rem); 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            color: var(--gray); 
+            margin-bottom: 15px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
+            padding-bottom: 10px; 
+        }
+        
         .others-title.libre-title { color: #475569; }
 
-        .guichet-row { display: flex; justify-content: space-between; align-items: center; background: var(--dark-gray); padding: 15px 25px; border-radius: 20px; margin-bottom: 12px; border: 1px solid rgba(255, 255, 255, 0.02); }
-        .guichet-row .name-block { display: flex; flex-direction: column; }
-        .guichet-row .guichet-id { font-size: 24px; font-weight: 800; color: var(--white); }
-        .guichet-row .patient-id { font-size: 15px; font-weight: 600; color: var(--gray); text-transform: capitalize; }
+        .guichet-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: var(--dark-gray); 
+            padding: 15px 25px; 
+            border-radius: 20px; 
+            margin-bottom: 12px; 
+            border: 1px solid rgba(255, 255, 255, 0.02); 
+        }
         
-        /* Badges de statuts sur la liste secondaire */
-        .guichet-row .ticket { font-size: 32px; font-weight: 900; color: var(--green); background: rgba(0, 217, 126, 0.08); padding: 4px 18px; border-radius: 12px; }
-        .guichet-row .status-libre { font-size: 16px; font-weight: 800; color: var(--gray); background: rgba(255, 255, 255, 0.03); padding: 6px 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); letter-spacing: 1px; }
+        .guichet-row .name-block { 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        .guichet-row .guichet-id { 
+            font-size: clamp(1.1rem, 2vw, 1.5rem); 
+            font-weight: 800; 
+            color: var(--white); 
+        }
+        
+        .guichet-row .patient-id { 
+            font-size: clamp(0.85rem, 1.5vw, 1rem); 
+            font-weight: 600; 
+            color: var(--gray); 
+            text-transform: capitalize; 
+        }
+        
+        .guichet-row .ticket { 
+            font-size: clamp(1.4rem, 3vw, 2rem); 
+            font-weight: 900; 
+            color: var(--green); 
+            background: rgba(0, 217, 126, 0.08); 
+            padding: 4px 18px; 
+            border-radius: 12px; 
+        }
+        
+        .guichet-row .status-libre { 
+            font-size: clamp(0.85rem, 1.5vw, 1rem); 
+            font-weight: 800; 
+            color: var(--gray); 
+            background: rgba(255, 255, 255, 0.03); 
+            padding: 6px 16px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            letter-spacing: 1px; 
+        }
 
-        .empty-global-state { text-align: center; color: var(--gray); margin-top: 60px; font-size: 20px; font-weight: 600; width: 100%; }
+        .empty-global-state { 
+            text-align: center; 
+            color: var(--gray); 
+            margin-top: 40px; 
+            font-size: 20px; 
+            font-weight: 600; 
+            width: 100%; 
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        
+        /* Tablettes et Écrans Mobiles verticalisés (Téléphones) */
+        @media (max-width: 850px) {
+            body {
+                padding: 15px;
+            }
+            .main-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .priority-box {
+                padding: 30px 15px;
+            }
+            .others-box {
+                padding: 20px;
+            }
+        }
+
+        /* Ajustements spécifiques pour l'affichage en mode paysage sur les petits appareils */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body { padding: 10px; }
+            header { margin-bottom: 15px; padding-bottom: 10px; }
+            .main-container { gap: 15px; }
+            .priority-box { padding: 15px; }
+            .others-box { padding: 15px; gap: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -60,7 +257,7 @@
 
     <div class="main-container">
         <div class="priority-box" id="priorityContainer">
-            <div class="empty-state" id="txtEmpty" style="font-size: 24px; color: var(--gray); font-weight: 600;">Aucun appel en cours.<br>Veuillez patienter...</div>
+            <div class="empty-state" id="txtEmpty" style="font-size: clamp(1.2rem, 3vw, 1.6rem); color: var(--gray); font-weight: 600;">Aucun appel en cours.<br>Veuillez patienter...</div>
             <div id="priorityContent" style="display: none; width: 100%;">
                 <div class="priority-label">Numéro Demandé</div>
                 <div class="priority-ticket" id="lblPriorityTicket">🔑 —</div>
@@ -71,21 +268,17 @@
             </div>
         </div>
 
-        <!-- Section de droite dynamique -->
         <div class="others-box" id="sidePanelsContainer">
-            <!-- Bloc des guichets Actifs -->
             <div class="section-group" id="groupActifs" style="display: none;">
                 <div class="others-title">Guichets Actifs</div>
                 <div id="listActifsGuichets"></div>
             </div>
 
-            <!-- Bloc des guichets Libres -->
             <div class="section-group" id="groupLibres" style="display: none;">
                 <div class="others-title libre-title">Guichets Libres</div>
                 <div id="listLibresGuichets"></div>
             </div>
             
-            <!-- Message de secours si TOUS les guichets de la DB sont introuvables -->
             <div class="empty-global-state" id="msgNoGuichet" style="display: none;">
                 Tous les guichets sont hors ligne.
             </div>
@@ -136,7 +329,7 @@
             let plusRecentTimestamp = 0;
             let declencherVocal = false;
 
-            // Analyse pour le guichet principal clignotant
+            // Analyse pour le guichet principal
             for (let i = 1; i <= 5; i++) {
                 let g = guichetsData[`guichet_${i}`] || { statut: "Libre", ticket: "Libre", nom: "" };
                 
@@ -195,7 +388,6 @@
                 let g = guichetsData[`guichet_${i}`] || { statut: "Libre", ticket: "Libre", nom: "" };
                 
                 if (g.ticket !== "Libre") {
-                    // Le guichet est ACTIF (occupe ou appelle un patient)
                     nbActifs++;
                     let displayNomMini = g.nom ? g.nom : "En cours";
                     containerActifs.innerHTML += `
@@ -208,7 +400,6 @@
                         </div>
                     `;
                 } else {
-                    // Le guichet est LIBRE
                     nbLibres++;
                     containerLibres.innerHTML += `
                         <div class="guichet-row" style="opacity: 0.65;">
@@ -222,21 +413,18 @@
                 }
             }
 
-            // Règle d'affichage : Si 0 actif, on cache la section complète
             if (nbActifs > 0) {
                 panelGroupActifs.style.display = "flex";
             } else {
                 panelGroupActifs.style.display = "none";
             }
 
-            // Règle d'affichage : Si 0 libre, on cache la section complète
             if (nbLibres > 0) {
                 panelGroupLibres.style.display = "flex";
             } else {
                 panelGroupLibres.style.display = "none";
             }
 
-            // Sécurité si la base de données est complètement vide
             if (nbActifs === 0 && nbLibres === 0) {
                 msgNoGuichet.style.display = "block";
             } else {
