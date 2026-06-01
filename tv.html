@@ -221,24 +221,13 @@
 
         /* --- RESPONSIVE MEDIA QUERIES --- */
         
-        /* Tablettes et Écrans Mobiles verticalisés (Téléphones) */
         @media (max-width: 850px) {
-            body {
-                padding: 15px;
-            }
-            .main-container {
-                flex-direction: column;
-                height: auto;
-            }
-            .priority-box {
-                padding: 30px 15px;
-            }
-            .others-box {
-                padding: 20px;
-            }
+            body { padding: 15px; }
+            .main-container { flex-direction: column; height: auto; }
+            .priority-box { padding: 30px 15px; }
+            .others-box { padding: 20px; }
         }
 
-        /* Ajustements spécifiques pour l'affichage en mode paysage sur les petits appareils */
         @media (max-height: 500px) and (orientation: landscape) {
             body { padding: 10px; }
             header { margin-bottom: 15px; padding-bottom: 10px; }
@@ -309,14 +298,64 @@
 
         let memoireForceVocal = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 
-        function lireAnnonceVocale(ticketNum, guichetId) {
+        // Génère électroniquement un bip carillon professionnel de type "Ding-Dong"
+        function jouerCarillonPro(callback) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) { if(callback) callback(); return; }
+                
+                const ctx = new AudioContext();
+                
+                // Première note (Le "Ding")
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(587.33, ctx.currentTime); // Note Ré5 (D5)
+                gain1.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.start();
+                osc1.stop(ctx.currentTime + 0.4);
+                
+                // Deuxième note (Le "Dong" - 0.25s plus tard)
+                setTimeout(() => {
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(440.00, ctx.currentTime); // Note La4 (A4)
+                    gain2.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.start();
+                    osc2.stop(ctx.currentTime + 0.5);
+                }, 250);
+
+                // Lance la synthèse vocale juste après la fin du carillon (0.75 seconde au total)
+                setTimeout(() => {
+                    if (callback) callback();
+                }, 750);
+
+            } catch (e) {
+                if (callback) callback();
+            }
+        }
+
+        function lireAnnonceVocale(ticketNum, guichetId, patientName) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const phrase = `Numéro ${ticketNum}, veuillez vous présenter au guichet ${guichetId}.`;
-                const message = new SpeechSynthesisUtterance(phrase);
-                message.lang = 'fr-FR';
-                message.rate = 0.95;
-                window.speechSynthesis.speak(message);
+                
+                // Déclenche d'abord le carillon pro, puis lit le texte dans le callback
+                jouerCarillonPro(() => {
+                    const nomClient = (patientName && patientName.trim() !== "") ? `, Monsieur ou Madame ${patientName},` : "";
+                    const phrase = `Numéro ${ticketNum}${nomClient}, veuillez vous présenter au guichet ${guichetId}.`;
+                    
+                    const message = new SpeechSynthesisUtterance(phrase);
+                    message.lang = 'fr-FR';
+                    message.rate = 0.95;
+                    window.speechSynthesis.speak(message);
+                });
             }
         }
 
@@ -329,7 +368,6 @@
             let plusRecentTimestamp = 0;
             let declencherVocal = false;
 
-            // Analyse pour le guichet principal
             for (let i = 1; i <= 5; i++) {
                 let g = guichetsData[`guichet_${i}`] || { statut: "Libre", ticket: "Libre", nom: "" };
                 
@@ -350,7 +388,6 @@
                 }
             }
 
-            // Gestion de la boîte principale
             const emptyBlock = document.getElementById("txtEmpty");
             const contentBlock = document.getElementById("priorityContent");
 
@@ -363,14 +400,13 @@
                 document.getElementById("lblPriorityGuichet").textContent = `GUICHET 0${guichetPrioritaireId}`;
 
                 if (declencherVocal) {
-                    lireAnnonceVocale(ticketPrioritaireNum, guichetPrioritaireId);
+                    lireAnnonceVocale(ticketPrioritaireNum, guichetPrioritaireId, nomPrioritairePatient);
                 }
             } else {
                 emptyBlock.style.display = "block";
                 contentBlock.style.display = "none";
             }
 
-            // --- GESTION DES LISTES DYNAMIQUES (ACTIFS vs LIBRES) ---
             const containerActifs = document.getElementById("listActifsGuichets");
             const containerLibres = document.getElementById("listLibresGuichets");
             
