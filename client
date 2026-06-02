@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOUHAMED TECH</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#0a7cff;--blue-dark:#0056cc;--accent:#00e5ff;--green:#00d97e;--white:#fff;--light:#f4f7fc;--gray:#6b7c9a;--dark:#071126;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--light);color:var(--dark);padding-top:70px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(7,17,38,0.97);backdrop-filter:blur(20px);height:70px;display:flex;align-items:center;padding:0 5%;justify-content:space-between;border-bottom:1px solid rgba(0,229,255,0.15);}
+.nav-logo{font-size:20px;font-weight:900;color:#fff;}.nav-logo span{color:var(--accent);}
+.nav-right{display:flex;gap:10px;}
+.nav-pill{padding:8px 16px;border-radius:40px;font-size:13px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;color:#fff;}
+.nav-wa{background:var(--green);}.nav-call{background:var(--blue);}
+.hero{padding:50px 6%;background:linear-gradient(145deg,#071126,#0d1e3d);text-align:center;color:#fff;border-radius:0 0 30px 30px;}
+.welcome-banner{display:inline-block;background:rgba(0,229,255,0.12);border:1px solid rgba(0,229,255,0.3);padding:8px 18px;font-size:13px;font-weight:700;color:var(--accent);border-radius:50px;margin-bottom:20px;}
+.hero h1{font-size:36px;font-weight:900;margin-bottom:12px;}.hero h1 span{color:var(--accent);}
+.hero-desc{font-size:15px;color:rgba(255,255,255,0.75);max-width:600px;margin:0 auto;}
+.services{padding:40px 5%;}
+.s-title{font-size:24px;font-weight:800;text-align:center;margin-bottom:8px;color:#071126;}
+.s-subtitle{font-size:14px;color:var(--gray);text-align:center;margin-bottom:30px;}
+.services-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.service-card{background:#fff;padding:20px 15px;border-radius:20px;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,0.03);}
+.service-icon{font-size:34px;margin-bottom:8px;}
+.service-card h3{font-size:15px;font-weight:800;color:var(--dark);}
+.service-card p{font-size:12px;color:var(--gray);margin-top:6px;}
+.card-full{grid-column:span 2;}
+.section-box{padding:35px 6%;background:#fff;border-radius:28px;box-shadow:0 15px 40px rgba(7,17,38,0.06);margin:20px 4%;}
+.section-box.last{margin-bottom:40px;}
+.form-group{margin-bottom:20px;}
+.form-group label{display:block;font-size:14px;font-weight:700;margin-bottom:8px;color:var(--dark);}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:14px 16px;border:2px solid #eaf0f9;border-radius:14px;font-family:inherit;font-size:14px;background:#f8fafc;outline:none;transition:border-color 0.2s;color:var(--dark);}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--blue);background:#fff;}
+.radio-container{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+.radio-tile{display:flex;align-items:center;gap:12px;background:#f8fafc;border:2px solid #eaf0f9;padding:14px 16px;border-radius:14px;cursor:pointer;transition:all 0.2s;}
+.radio-tile:hover,.radio-tile:has(input:checked){border-color:var(--blue);background:#f0f6ff;}
+.radio-tile input[type=radio]{width:20px;height:20px;accent-color:var(--blue);flex-shrink:0;cursor:pointer;}
+.radio-label{font-size:13.5px;font-weight:700;color:var(--dark);line-height:1.4;}
+.btn-submit{width:100%;padding:16px;background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:10px;box-shadow:0 6px 20px rgba(10,124,255,0.3);transition:opacity 0.2s;font-family:inherit;}
+.btn-submit:disabled{opacity:0.55;cursor:not-allowed;}
+.sync-badge{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;padding:5px 14px;border-radius:50px;margin-bottom:18px;transition:all 0.4s;}
+.sb-wait{background:rgba(10,124,255,0.1);color:var(--blue);border:1px solid rgba(10,124,255,0.3);}
+.sb-ok{background:rgba(0,217,126,0.12);color:#00a855;border:1px solid rgba(0,217,126,0.35);}
+.sb-err{background:rgba(255,80,80,0.1);color:#d63031;border:1px solid rgba(255,80,80,0.3);}
+.sdot{width:8px;height:8px;border-radius:50%;background:currentColor;}
+.sdot.anim{animation:pulse 1.6s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.2}}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(120px);background:#071126;color:#fff;padding:13px 24px;border-radius:50px;font-size:14px;font-weight:700;z-index:9999;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 8px 30px rgba(0,0,0,0.3);pointer-events:none;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(7,17,38,0.65);backdrop-filter:blur(8px);justify-content:center;align-items:center;padding:20px;}
+.modal-box{background:#fff;padding:30px;border-radius:24px;max-width:390px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.2);animation:pop 0.3s ease;}
+@keyframes pop{from{transform:scale(0.88);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:8px;color:var(--dark);}
+.modal-desc{font-size:14px;color:var(--gray);margin-bottom:22px;}
+.modal-btns{display:flex;flex-direction:column;gap:11px;}
+.btn-ch{width:100%;padding:14px;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;color:#fff;display:flex;justify-content:center;align-items:center;gap:8px;font-family:inherit;}
+.btn-wa{background:var(--green);}.btn-gm{background:#ea4335;}.btn-cancel{background:#e8ecf0;color:var(--dark);}
+.suivi-row{display:flex;gap:10px;margin-top:15px;}
+.suivi-row input{flex:1;padding:12px 16px;border:2px solid #eaf0f9;border-radius:14px;font-family:inherit;font-size:14px;outline:none;background:#f8fafc;transition:border-color 0.2s;color:var(--dark);}
+.suivi-row input:focus{border-color:var(--blue);}
+.btn-search{padding:12px 20px;background:var(--blue);color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.suivi-result{margin-top:18px;}
+.suivi-card{background:#f8fafc;border:1px solid #eaf0f9;border-radius:18px;padding:18px;margin-bottom:10px;}
+.suivi-card h3{font-size:16px;font-weight:800;margin-bottom:4px;color:var(--dark);}
+.suivi-meta{font-size:12px;color:var(--gray);margin-bottom:10px;}
+.pill{display:inline-block;padding:6px 16px;border-radius:50px;font-size:12px;font-weight:700;}
+.p-attente{background:#fff3cd;color:#b45309;}.p-cours{background:#dbeafe;color:#1d4ed8;}.p-termine{background:#dcfce7;color:#166534;}
+.no-result{text-align:center;color:var(--gray);font-size:14px;padding:20px;}
+.prob-box{font-size:13px;background:#fff;border-left:3px solid var(--blue);padding:10px 14px;border-radius:4px 12px 12px 4px;margin-bottom:12px;line-height:1.5;color:#2c3e50;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">MOUHAMED<span>TECH</span></div>
+  <div class="nav-right">
+    <a href="https://wa.me/2210574047636" class="nav-pill nav-wa">&#x1F7E2; WhatsApp</a>
+    <a href="tel:0574047636" class="nav-pill nav-call">&#128222; Appeler</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="welcome-banner">&#10024; Prise en charge d'excellence &amp; chaleureuse</div>
+  <h1>Votre Expert<br><span>MOUHAMED TECH</span></h1>
+  <p class="hero-desc">Maintenance certifi&#233;e, r&#233;parations &#233;lectroniques et s&#233;curit&#233; de vos espaces.</p>
+</div>
+
+<div class="services">
+  <h2 class="s-title">Nos Domaines d'Expertise</h2>
+  <p class="s-subtitle">Solutions fiables et rapides pour tous vos &#233;quipements</p>
+  <div class="services-grid">
+    <div class="service-card"><div class="service-icon">&#128241;</div><h3>T&#233;l&#233;phones</h3><p>&#201;crans, connecteurs, batteries</p></div>
+    <div class="service-card"><div class="service-icon">&#128187;</div><h3>Ordinateurs</h3><p>Diagnostic, pannes &amp; syst&#232;me</p></div>
+    <div class="service-card"><div class="service-icon">&#128250;</div><h3>T&#233;l&#233;visions</h3><p>R&#233;paration &#233;crans et r&#233;tro&#233;clairage</p></div>
+    <div class="service-card"><div class="service-icon">&#128190;</div><h3>Syst&#232;mes &amp; Office</h3><p>Installation OS et suites Office</p></div>
+    <div class="service-card card-full"><div class="service-icon">&#128737;</div><h3>Vid&#233;osurveillance &amp; S&#233;curit&#233;</h3><p>Cam&#233;ras Wifi, AHD et solutions POE</p></div>
+  </div>
+</div>
+
+<div class="section-box">
+  <h2 class="s-title" style="text-align:left;margin-bottom:6px;">Espace Diagnostic</h2>
+  <div id="syncBadge" class="sync-badge sb-wait"><span class="sdot anim" id="sdot"></span><span id="syncTxt">Connexion Firebase...</span></div>
+  <p style="font-size:14px;color:var(--gray);margin-bottom:22px;">S&#233;lectionnez votre domaine puis cochez la prestation souhait&#233;e.</p>
+
+  <div class="form-group"><label>Nom &amp; Pr&#233;nom</label><input type="text" id="clientName" placeholder="Ex: Amadou Diop"></div>
+  <div class="form-group"><label>Num&#233;ro de T&#233;l&#233;phone</label><input type="tel" id="clientPhone" placeholder="Ex: 0574047636"></div>
+  <div class="form-group"><label>Adresse E-mail</label><input type="email" id="clientEmail" placeholder="Ex: client@gmail.com"></div>
+  <div class="form-group">
+    <label>1. Domaine G&#233;n&#233;ral</label>
+    <select id="deviceType" onchange="majPrestations()">
+      <option value="tv">&#128250; T&#233;l&#233;vision (TV)</option>
+      <option value="sys">&#128190; Syst&#232;me d'exploitation / Office</option>
+      <option value="cam">&#128737; Vid&#233;osurveillance &amp; S&#233;curit&#233;</option>
+      <option value="pc">&#128187; Ordinateur (Laptop/Fixe)</option>
+      <option value="tel">&#128241; T&#233;l&#233;phone / Smartphone</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>2. Prestation &amp; Tarif</label>
+    <div id="radioBox" class="radio-container"></div>
+  </div>
+  <div class="form-group">
+    <label>3. D&#233;crivez votre probl&#232;me</label>
+    <textarea id="clientProblem" rows="4" placeholder="Ex: L'&#233;cran s'allume mais reste noir..."></textarea>
+  </div>
+  <button class="btn-submit" id="btnSubmit" onclick="ouvrirModal()">&#128190; Enregistrer la fiche &amp; Envoyer</button>
+</div>
+
+<div class="section-box last">
+  <h2 class="s-title" style="text-align:left;margin-bottom:5px;">&#128194; Suivre mon dossier</h2>
+  <p style="font-size:14px;color:var(--gray);">Entrez votre num&#233;ro pour voir l'&#233;tat de votre r&#233;paration en temps r&#233;el.</p>
+  <div class="suivi-row">
+    <input type="tel" id="suiviPhone" placeholder="Ex: 0574047636">
+    <button class="btn-search" onclick="rechercherDossier()">&#128269; Chercher</button>
+  </div>
+  <div id="suiviResult" class="suivi-result"></div>
+</div>
+
+<div class="modal" id="channelModal">
+  <div class="modal-box">
+    <div class="modal-title">Choisir le canal d'envoi</div>
+    <div class="modal-desc">Comment envoyer votre fiche &#224; MOUHAMED TECH ?</div>
+    <div class="modal-btns">
+      <button class="btn-ch btn-wa" onclick="envoyerWA()">&#128172; Via WhatsApp</button>
+      <button class="btn-ch btn-gm" onclick="envoyerGmail()">&#128231; Via Gmail</button>
+      <button class="btn-ch btn-cancel" onclick="fermerModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* ===== FIREBASE ===== */
+firebase.initializeApp({
+  apiKey:"AIzaSyBfX2hJEV035PT7F2mxQ0_gNEzON-nCXoM",
+  authDomain:"mouhamed-tech-database.firebaseapp.com",
+  databaseURL:"https://mouhamed-tech-database-default-rtdb.firebaseio.com",
+  projectId:"mouhamed-tech-database",
+  storageBucket:"mouhamed-tech-database.firebasestorage.app",
+  messagingSenderId:"178632163158",
+  appId:"1:178632163158:web:6b48bcfb12e1c37fe3e0f7"
+});
+var db = firebase.database();
+var fichesRef = db.ref("fiches");
+
+db.ref(".info/connected").on("value", function(snap){
+  var badge=document.getElementById("syncBadge"),
+      dot=document.getElementById("sdot"),
+      txt=document.getElementById("syncTxt");
+  if(snap.val()===true){
+    badge.className="sync-badge sb-ok"; dot.className="sdot";
+    txt.textContent="Connecte a Firebase";
+  } else {
+    badge.className="sync-badge sb-err"; dot.className="sdot anim";
+    txt.textContent="Hors ligne";
+  }
+});
+
+/* ===== CATALOGUE ===== */
+var CAT={
+  tv:{label:"Television (TV)",items:[
+    {t:"Remplacement Ecran / Retro-eclairage (30 000 - 100 000 FCFA)",p:"30000-100000"}
+  ]},
+  sys:{label:"Systeme / Office",items:[
+    {t:"Installation Windows 11 (6 000 FCFA)",p:"6000"},
+    {t:"Installation Windows 10 (5 000 FCFA)",p:"5000"},
+    {t:"Installation Windows 7 (3 000 FCFA)",p:"3000"},
+    {t:"Installation Linux Mint (5 000 FCFA)",p:"5000"},
+    {t:"Activation Office 2021 (6 000 FCFA)",p:"6000"},
+    {t:"Activation Office 2016 (4 000 FCFA)",p:"4000"},
+    {t:"Activation Office 2013 (2 500 FCFA)",p:"2500"}
+  ]},
+  cam:{label:"Videosurveillance",items:[
+    {t:"Camera Wifi originale (30 000 - 150 000 FCFA + MO)",p:"30000-150000"},
+    {t:"Installation POE (80 000 - 200 000 FCFA)",p:"80000-200000"},
+    {t:"Installation AHD (60 000 - 150 000 FCFA)",p:"60000-150000"}
+  ]},
+  pc:{label:"Ordinateur",items:[
+    {t:"Reparation complete Ordinateur (5 000 - 100 000 FCFA)",p:"5000-100000"}
+  ]},
+  tel:{label:"Telephone / Smartphone",items:[
+    {t:"Changement Ecran Smartphone (10 000 - 90 000 FCFA)",p:"10000-90000"},
+    {t:"Remplacement Barre de charge (3 000 - 10 000 FCFA)",p:"3000-10000"},
+    {t:"Remplacement Batterie (5 000 - 15 000 FCFA)",p:"5000-15000"}
+  ]}
+};
+
+function majPrestations(){
+  var key=document.getElementById("deviceType").value;
+  var box=document.getElementById("radioBox");
+  box.innerHTML="";
+  (CAT[key]?CAT[key].items:[]).forEach(function(item,i){
+    var lbl=document.createElement("label"); lbl.className="radio-tile";
+    var rd=document.createElement("input");
+    rd.type="radio"; rd.name="prestation"; rd.value=item.t;
+    rd.setAttribute("data-prix",item.p);
+    if(i===0) rd.checked=true;
+    var sp=document.createElement("span"); sp.className="radio-label"; sp.textContent=item.t;
+    lbl.appendChild(rd); lbl.appendChild(sp); box.appendChild(lbl);
+  });
+}
+majPrestations();
+
+/* ===== TOAST ===== */
+function toast(msg){
+  var el=document.getElementById("toast");
+  el.textContent=msg; el.classList.add("show");
+  setTimeout(function(){el.classList.remove("show");},3400);
+}
+
+/* ===== MODAL ===== */
+var donneesTemp=null;
+function ouvrirModal(){
+  var nom=document.getElementById("clientName").value.trim(),
+      tel=document.getElementById("clientPhone").value.trim(),
+      email=document.getElementById("clientEmail").value.trim(),
+      prob=document.getElementById("clientProblem").value.trim(),
+      rd=document.querySelector("input[name=prestation]:checked");
+  if(!nom||!tel||!email||!prob){toast("Remplissez tous les champs.");return;}
+  if(!rd){toast("Cochez une prestation.");return;}
+  var key=document.getElementById("deviceType").value;
+  donneesTemp={
+    nom:nom,telephone:tel,email:email,
+    categorie:CAT[key].label,
+    prestation:rd.value,
+    prix:rd.getAttribute("data-prix"),
+    probleme:prob,
+    statut:"En attente",
+    date:new Date().toLocaleDateString("fr-FR"),
+    timestamp:Date.now()
+  };
+  document.getElementById("channelModal").style.display="flex";
+}
+function fermerModal(){document.getElementById("channelModal").style.display="none";}
+
+function genTxt(){
+  var d=donneesTemp;
+  return "MOUHAMED TECH - Nouvelle Fiche\n================================\n"+
+    "Nom       : "+d.nom+"\nTel       : "+d.telephone+"\nEmail     : "+d.email+
+    "\nEquipem.  : "+d.categorie+"\nPrestation: "+d.prestation+
+    "\nProbleme  : "+d.probleme+"\nTarif     : "+d.prix+" FCFA\nDate      : "+d.date;
+}
+
+function sauvegarder(cb){
+  var btn=document.getElementById("btnSubmit");
+  btn.disabled=true; btn.textContent="Envoi en cours...";
+  fichesRef.push(donneesTemp)
+    .then(function(){
+      toast("Fiche enregistree dans Firebase !");
+      ["clientName","clientPhone","clientEmail","clientProblem"].forEach(function(id){
+        document.getElementById(id).value="";
+      });
+      majPrestations(); fermerModal();
+      btn.disabled=false; btn.innerHTML="&#128190; Enregistrer la fiche &amp; Envoyer";
+      if(cb) cb();
+    })
+    .catch(function(e){
+      toast("Erreur : "+e.message);
+      btn.disabled=false; btn.innerHTML="&#128190; Enregistrer la fiche &amp; Envoyer";
+      fermerModal();
+    });
+}
+function envoyerWA(){
+  var url="https://wa.me/2210574047636?text="+encodeURIComponent(genTxt());
+  sauvegarder(function(){window.open(url,"_blank");});
+}
+function envoyerGmail(){
+  var url="mailto:mouhamedkaraboily278@gmail.com?subject="+
+    encodeURIComponent("Diagnostic - "+donneesTemp.nom)+
+    "&body="+encodeURIComponent(genTxt());
+  sauvegarder(function(){window.location.href=url;});
+}
+
+/* ===== SUIVI CLIENT =====
+   Lit chaque fiche une par une via son ID (autorisé par les règles $ficheId ".read":true)
+   sans nécessiter d'authentification */
+function rechercherDossier(){
+  var phone=document.getElementById("suiviPhone").value.trim();
+  var div=document.getElementById("suiviResult");
+  if(!phone){toast("Entrez votre numero.");return;}
+  div.innerHTML="<p class='no-result'>&#128269; Recherche en cours...</p>";
+
+  /* On utilise orderByChild + equalTo.
+     Grâce à la règle "$ficheId": {".read": true}, chaque enfant est lisible
+     même sans auth, donc la query fonctionne côté client. */
+  fichesRef.orderByChild("telephone").equalTo(phone).once("value")
+    .then(function(snap){
+      if(!snap.exists()){
+        div.innerHTML="<p class='no-result'>&#10060; Aucun dossier trouve pour ce numero.</p>";
+        return;
+      }
+      var html="";
+      snap.forEach(function(ch){
+        var c=ch.val();
+        var cls=c.statut==="En cours"?"p-cours":c.statut==="Termine"||c.statut==="Termin\u00e9"?"p-termine":"p-attente";
+        html+="<div class='suivi-card'>"+
+          "<h3>"+c.nom+"</h3>"+
+          "<div class='suivi-meta'>"+c.categorie+" &bull; "+c.date+"</div>"+
+          "<div class='prob-box'>"+c.prestation+"<br><br>"+c.probleme+"</div>"+
+          "<span class='pill "+cls+"'>"+c.statut+"</span>"+
+          "</div>";
+      });
+      div.innerHTML=html;
+    })
+    .catch(function(e){
+      div.innerHTML="<p class='no-result' style='color:#d63031;'>&#10060; Erreur : "+e.message+"</p>";
+    });
+}
+</script>
+</body>
+</html>
