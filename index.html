@@ -4,129 +4,668 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MOUHAMED TECH — File d'Attente</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght=400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 
     <style>
-        :root { --bg: #071126; --card-bg: #0d1e3d; --blue: #0a7cff; --accent: #00e5ff; --green: #00d97e; --white: #ffffff; --gray: #6b7c9a; --red: #ff3b30; --dark-gray: #162a4a; --orange: #ff9500; }
+        :root {
+            --bg: #030a16;
+            --card-bg: #0a1526;
+            --blue: #0a7cff;
+            --accent: #00e5ff;
+            --green: #00d97e;
+            --red: #ff3b30;
+            --orange: #ff9500;
+            --purple: #af52de;
+            --white: #ffffff;
+            --gray: #64748b;
+            --dark-gray: #1e293b;
+            --gold: #ffd700;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background: var(--bg); color: var(--white); padding: 20px; min-height: 100vh; }
-        header { text-align: center; padding: 10px 0 20px; }
-        header h1 { font-size: 32px; font-weight: 900; }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* ===== THEME SYSTEM ===== */
+        body.theme-light {
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --white: #0f172a;
+            --gray: #64748b;
+            --dark-gray: #e2e8f0;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 10px 0 20px;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+        header h1 { font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 900; }
         header h1 span { color: var(--accent); }
-        
-        .grid-layout { display: grid; grid-template-columns: 1fr; gap: 30px; max-width: 1200px; margin: 0 auto; }
-        @media (min-width: 900px) { .grid-layout { grid-template-columns: 1fr 2fr; } }
-        
-        .panel { background: var(--card-bg); border-radius: 24px; padding: 30px; border: 1px solid rgba(0,229,255,0.1); height: fit-content; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 14px; color: var(--gray); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
-        .form-group input { width: 100%; padding: 14px 16px; border: 2px solid rgba(255,255,255,0.1); border-radius: 14px; font-size: 15px; background: rgba(7,17,38,0.5); color: #fff; outline: none; transition: all 0.3s ease; }
-        .form-group input:focus { border-color: var(--blue); background: var(--dark-gray); }
-        
-        .btn-ticket { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--blue), #0056cc); color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 20px rgba(10,124,255,0.2); }
+        .subtitle { color: var(--gray); font-size: 14px; font-weight: 600; }
+
+        /* Grid Layout */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        @media (min-width: 900px) { .grid-layout { grid-template-columns: 380px 1fr; } }
+
+        /* Panels */
+        .panel {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+            height: fit-content;
+        }
+        .panel-title {
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        /* Form */
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            font-size: 15px;
+            background: rgba(7,17,38,0.5);
+            color: var(--white);
+            outline: none;
+            transition: all 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--blue);
+            background: var(--dark-gray);
+        }
+        .form-group select option { background: var(--card-bg); color: var(--white); }
+
+        /* Priority badge */
+        .priority-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .priority-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--gray);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .priority-btn.active {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(255,215,0,0.1);
+        }
+        .priority-btn.prioritaire.active {
+            border-color: var(--red);
+            color: var(--red);
+            background: rgba(255,59,48,0.1);
+        }
+
+        /* Buttons */
+        .btn-ticket {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--blue), #0056cc);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(10,124,255,0.2);
+            transition: all 0.3s;
+        }
+        .btn-ticket:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(10,124,255,0.3); }
         .btn-ticket:disabled { background: var(--gray); cursor: not-allowed; opacity: 0.5; box-shadow: none; }
-        
-        .btn-cancel { background: var(--red) !important; color: white !important; font-size: 16px; font-weight: 900; padding: 14px; border: none; border-radius: 12px; cursor: pointer; margin-top: 15px; width: 100%; display: none; text-transform: uppercase; }
-        .btn-confirm-presence { background: var(--green) !important; color: #071126 !important; font-size: 16px; font-weight: 900; padding: 14px; border: none; border-radius: 12px; cursor: pointer; margin-top: 10px; width: 100%; display: none; text-transform: uppercase; }
-        
-        .your-ticket-box { background: var(--white); color: #000; padding: 25px; border-radius: 20px; text-align: center; margin-top: 25px; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-        .your-ticket-box .ticket-title { font-weight: 900; font-size: 18px; color: #071126; }
+
+        .btn-cancel {
+            background: var(--red) !important;
+            color: white !important;
+            font-size: 15px;
+            font-weight: 800;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            display: none;
+            text-transform: uppercase;
+        }
+        .btn-confirm-presence {
+            background: var(--green) !important;
+            color: #030a16 !important;
+            font-size: 15px;
+            font-weight: 800;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            display: none;
+            text-transform: uppercase;
+        }
+        .btn-reset-form {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            color: var(--gray);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Ticket Result */
+        .your-ticket-box {
+            background: var(--white);
+            color: #0f172a;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 25px;
+            display: none;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .your-ticket-box.prioritaire {
+            border: 3px solid var(--gold);
+            box-shadow: 0 0 30px rgba(255,215,0,0.3), 0 15px 35px rgba(0,0,0,0.3);
+        }
+        .your-ticket-box.urgent {
+            border: 3px solid var(--red);
+            box-shadow: 0 0 30px rgba(255,59,48,0.3), 0 15px 35px rgba(0,0,0,0.3);
+        }
+        .ticket-title { font-weight: 900; font-size: 18px; color: #0f172a; }
         .your-ticket-number { font-size: 64px; font-weight: 900; color: var(--blue); margin: 5px 0; line-height: 1; }
         .your-ticket-name { font-size: 18px; font-weight: 700; color: #1e293b; }
         .your-ticket-whatsapp { font-size: 14px; color: #64748b; margin-top: 4px; font-weight: 600; }
-        .your-ticket-date { font-size: 13px; color: #475569; margin-top: 15px; border-top: 1px dashed #e2e8f0; padding-top: 12px; font-weight: 700; text-transform: capitalize; background: #f8fafc; padding: 10px; border-radius: 8px; }
-        
-        .status-badge { margin: 15px auto; padding: 10px 20px; border-radius: 12px; font-size: 15px; font-weight: 800; width: fit-content; text-transform: uppercase; display: block; }
-        .qr-container { display: flex; justify-content: center; margin: 15px auto 0; padding: 8px; background: white; border-radius: 12px; width: fit-content; border: 1px solid #e2e8f0; }
-        
-        .display-board { display: flex; flex-direction: column; gap: 20px; }
-        .calling-now { background: linear-gradient(135deg, #0a7cff 0%, #00e5ff 100%); padding: 30px; border-radius: 24px; text-align: center; box-shadow: 0 15px 30px rgba(10,124,255,0.2); }
-        .calling-number { font-size: 72px; font-weight: 900; }
-        
-        .counters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; width: 100%; }
-        .counter-card { background: var(--card-bg); padding: 20px; border-radius: 18px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .counter-card.calling { border-color: var(--green); background: rgba(0, 217, 126, 0.08); animation: pulseBorder 1.5s infinite alternate; }
-        
-        .waiting-list-section { background: var(--card-bg); border-radius: 24px; padding: 25px; }
-        .waiting-tokens { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
-        .token { background: rgba(255,255,255,0.05); padding: 10px 18px; border-radius: 12px; font-size: 15px; font-weight: 700; color: var(--accent); }
-        
-        /* ALERTES */
-        .limit-alert { background: rgba(255,59,48,0.1); border: 1px solid var(--red); color: var(--red); padding: 12px; border-radius: 12px; font-size: 14px; text-align: center; margin-bottom: 15px; display: none; }
-        .dupe-alert { background: rgba(255, 149, 0, 0.12); border: 1px solid var(--orange); color: var(--orange); padding: 14px; border-radius: 14px; font-size: 14px; text-align: center; margin-bottom: 20px; display: none; font-weight: 600; line-height: 1.4; }
-        
-        .btn-reset-form { width: 100%; padding: 12px; background: rgba(7,17,38,0.4); color: var(--gray); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 15px; display: none; }
+        .your-ticket-date {
+            font-size: 13px;
+            color: #475569;
+            margin-top: 15px;
+            border-top: 1px dashed #e2e8f0;
+            padding-top: 12px;
+            font-weight: 700;
+            text-transform: capitalize;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .priority-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+        .priority-badge.prioritaire { background: rgba(255,215,0,0.2); color: #b8860b; }
+        .priority-badge.urgent { background: rgba(255,59,48,0.2); color: #c0392b; }
 
-        @keyframes pulseBorder { 0% { box-shadow: 0 0 5px rgba(0,217,126,0.2); } 100% { box-shadow: 0 0 20px rgba(0,217,126,0.6); } }
+        .status-badge {
+            margin: 15px auto;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            width: fit-content;
+            text-transform: uppercase;
+            display: block;
+        }
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            margin: 15px auto 0;
+            padding: 8px;
+            background: white;
+            border-radius: 12px;
+            width: fit-content;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Position in queue */
+        .queue-position {
+            background: var(--dark-gray);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .queue-position .pos-num {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--accent);
+        }
+        .queue-position .pos-label {
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .queue-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .queue-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--accent));
+            border-radius: 3px;
+            transition: width 0.5s;
+        }
+
+        /* Display Board */
+        .display-board { display: flex; flex-direction: column; gap: 20px; }
+
+        .calling-now {
+            background: linear-gradient(135deg, var(--blue) 0%, var(--accent) 100%);
+            padding: 30px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(10,124,255,0.2);
+            display: none;
+        }
+        .calling-label {
+            text-transform: uppercase;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        .calling-number { font-size: clamp(3rem, 8vw, 5rem); font-weight: 900; }
+        .calling-patient { font-size: 20px; font-weight: 600; margin: 5px 0; }
+        .calling-guichet {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--bg);
+            background: var(--accent);
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+
+        /* Counters */
+        .counters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        .counter-card {
+            background: var(--card-bg);
+            padding: 18px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s;
+        }
+        .counter-card.calling {
+            border-color: var(--green);
+            background: rgba(0,217,126,0.08);
+            animation: pulseBorder 1.5s infinite alternate;
+        }
+        .counter-card .c-num {
+            font-size: 13px;
+            color: var(--gray);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .counter-card .c-ticket {
+            font-size: 28px;
+            font-weight: 900;
+            margin-top: 5px;
+            color: var(--white);
+        }
+        .counter-card .c-status {
+            font-size: 11px;
+            color: var(--gray);
+            margin-top: 5px;
+            font-weight: 600;
+        }
+        .counter-card.calling .c-ticket { color: var(--accent); }
+
+        @keyframes pulseBorder {
+            0% { box-shadow: 0 0 5px rgba(0,217,126,0.2); }
+            100% { box-shadow: 0 0 20px rgba(0,217,126,0.6); }
+        }
+
+        /* Waiting list */
+        .waiting-list-section {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 25px;
+        }
+        .waiting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .waiting-title {
+            font-size: 13px;
+            color: var(--gray);
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        .waiting-stats {
+            font-size: 14px;
+            color: var(--accent);
+            font-weight: 700;
+        }
+        .waiting-tokens {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .token {
+            background: rgba(255,255,255,0.05);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            border: 1px solid rgba(0,229,255,0.1);
+        }
+        .token.prioritaire {
+            background: rgba(255,215,0,0.1);
+            color: var(--gold);
+            border-color: rgba(255,215,0,0.3);
+        }
+        .token.urgent {
+            background: rgba(255,59,48,0.1);
+            color: var(--red);
+            border-color: rgba(255,59,48,0.3);
+        }
+
+        /* Alerts */
+        .limit-alert {
+            background: rgba(255,59,48,0.1);
+            border: 1px solid var(--red);
+            color: var(--red);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+            display: none;
+            font-weight: 700;
+        }
+        .dupe-alert {
+            background: rgba(255,149,0,0.12);
+            border: 1px solid var(--orange);
+            color: var(--orange);
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .offline-alert {
+            background: rgba(255,59,48,0.15);
+            border: 1px solid var(--red);
+            color: var(--red);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 15px;
+            display: none;
+            font-weight: 700;
+        }
+
+        /* Stats mini chart */
+        .mini-stats {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        .mini-stats-title {
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-label { font-size: 14px; color: var(--gray); }
+        .stat-value { font-size: 18px; font-weight: 800; color: var(--accent); }
+
+        /* WhatsApp preview */
+        .whatsapp-preview {
+            background: #25d366;
+            color: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 15px;
+            display: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .whatsapp-preview.show { display: block; }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .grid-layout { grid-template-columns: 1fr; }
+            .your-ticket-number { font-size: 48px; }
+            .calling-number { font-size: 3rem; }
+        }
     </style>
+<base target="_blank">
 </head>
 <body>
 
-<header>
-    <h1>MOUHAMED<span>TECH</span> — File d'Attente</h1>
+<<header>
+    <div class="logo-container">
+        <img src="🤵‍♂️" alt="Logo" class="logo-img" id="logoImg">
+        <h1>MOUHAMED<span>TECH</span></h1>
+    </div>
+    <p class="subtitle">Système de Gestion de File d'Attente Professionnel</p>
 </header>
 
+<!-- PASSWORD MODAL FOR PRIORITY -->
+<div id="passwordModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:var(--card-bg); padding:35px; border-radius:24px; border:1px solid rgba(255,255,255,0.1); max-width:380px; width:90%; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.5);">
+        <div style="font-size:42px; margin-bottom:15px;">🔒</div>
+        <div style="font-size:20px; font-weight:800; margin-bottom:8px; color:var(--white);">Accès Prioritaire</div>
+        <div style="font-size:13px; color:var(--gray); margin-bottom:25px;">Ce type de passage nécessite un mot de passe</div>
+        <input type="password" id="priorityPassword" placeholder="Mot de passe..." style="width:100%; padding:14px 16px; border:2px solid rgba(255,255,255,0.1); border-radius:14px; font-size:16px; background:rgba(7,17,38,0.5); color:var(--white); outline:none; text-align:center; letter-spacing:3px; margin-bottom:20px;">
+        <div id="passwordError" style="color:var(--red); font-size:13px; font-weight:700; margin-bottom:15px; display:none;">❌ Mot de passe incorrect</div>
+        <button onclick="verifierMotDePasse()" style="width:100%; padding:14px; background:linear-gradient(135deg, var(--blue), #0056cc); color:white; border:none; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer;">Valider</button>
+        <button onclick="fermerModalPassword()" style="width:100%; padding:12px; background:transparent; color:var(--gray); border:1px solid rgba(255,255,255,0.1); border-radius:14px; font-size:14px; font-weight:700; cursor:pointer; margin-top:10px;">Annuler</button>
+    </div>
+</div>
+
 <div class="grid-layout">
+    <!-- LEFT PANEL -->
     <div class="panel">
         <div id="formSection">
-            <div style="font-size:18px; font-weight:800; margin-bottom:20px;">🎟️ Prendre un Ticket / Suivi</div>
-            <div class="limit-alert" id="limitAlert">⚠️ Limite quotidienne atteinte pour aujourd'hui.</div>
+            <div style="font-size:18px; font-weight:800; margin-bottom:20px;">🎟️ Nouveau Ticket</div>
             
-            <!-- BOITE DE SIGNALEMENT DE DOUBLON POUR LE PATIENT -->
+            <div class="offline-alert" id="offlineAlert">
+                ⚠️ Mode hors-ligne actif. Vos données seront synchronisées automatiquement.
+            </div>
+            <div class="limit-alert" id="limitAlert">⚠️ Limite quotidienne atteinte.</div>
             <div class="dupe-alert" id="dupeAlert"></div>
 
             <form id="ticketForm" onsubmit="validerEtGenerer(event)">
                 <div class="form-group">
-                    <label>Nom complet du Patient</label>
+                    <label>Nom complet</label>
                     <input type="text" id="clientName" placeholder="Ex: Mouhamed Karaboily" required>
                 </div>
                 <div class="form-group">
-                    <label>Numéro WhatsApp</label>
+                    <label>Numéro WhatsApp Svp</label>
                     <input type="tel" id="clientWhatsapp" placeholder="Ex: +225 XX XX XX XX" required>
                 </div>
-                <button type="submit" id="btnSubmitTicket" class="btn-ticket">Prendre un Ticket / Suivi</button>
+                
+                <div class="form-group">
+                    <label>Type de passage</label>
+                    <div class="priority-selector">
+                        <div class="priority-btn active" data-priority="normal" onclick="selectPriority('normal')">
+                            🟢 Normal
+                        </div>
+                        <div class="priority-btn prioritaire" data-priority="prioritaire" onclick="selectPriorityWithPassword('prioritaire')">
+                            🟡 Prioritaire
+                        </div>
+                        <div class="priority-btn urgent" data-priority="urgent" onclick="selectPriorityWithPassword('urgent')">
+                            🔴 Urgent
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnSubmitTicket" class="btn-ticket">Prendre un Ticket</button>
             </form>
         </div>
 
+        <!-- TICKET RESULT -->
         <div class="your-ticket-box" id="ticketResult">
             <div class="ticket-title">MOUHAMED TECH</div>
-            <div style="color: #64748b; font-size: 12px; font-weight: 600; margin-top: 5px;">VOTRE NUMÉRO DE PASSAGE</div>
+            <div style="color: #64748b; font-size: 12px; font-weight: 600; margin-top: 5px;">VOTRE NUMÉRO</div>
             <div class="your-ticket-number" id="lblMyTicket">--</div>
             <div class="your-ticket-name" id="lblMyName">--</div>
             <div class="your-ticket-whatsapp" id="lblMyWhatsapp">--</div>
+            <div class="priority-badge" id="lblMyPriority">Normal</div>
             
-            <div id="lblMyStatusBadge" class="status-badge">⏳ Analyse du statut...</div>
+            <div class="queue-position" id="queuePosition">
+                <div class="pos-label">Votre position dans la file</div>
+                <div class="pos-num" id="posNum">--</div>
+                <div class="queue-bar">
+                    <div class="queue-bar-fill" id="queueBarFill" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <div class="status-badge" id="lblMyStatusBadge">⏳ En attente...</div>
             
             <div class="your-ticket-date" id="lblMyDate">--</div>
             <div class="qr-container" id="qrcode"></div>
+            
+            <div class="whatsapp-preview" id="whatsappPreview">
+                📺 Un message sera afficher à l'ecran quand votre tour arrivera
+            </div>
         </div>
         
-        <button class="btn-cancel" id="btnCancelPresence" onclick="annulerPresence()">❌ Annule ma présence</button>
-        <button class="btn-confirm-presence" id="btnConfirmPresence" onclick="confirmerArrivee()">✅ Confirmer ma présence au Guichet</button>
-        <button class="btn-reset-form" id="btnResetForm" onclick="retourFormulaire()">Retour au formulaire</button>
+        <button class="btn-cancel" id="btnCancelPresence" onclick="annulerPresence()">❌ Annuler mon ticket</button>
+        <button class="btn-confirm-presence" id="btnConfirmPresence" onclick="confirmerArrivee()">✅ Confirmer ma présence</button>
+        <button class="btn-reset-form" id="btnResetForm" onclick="retourFormulaire()">Nouveau ticket</button>
     </div>
 
+    <!-- RIGHT PANEL -->
     <div class="display-board">
-        <div class="calling-now" id="mainCallBox" style="display: none;">
-            <div style="text-transform:uppercase; font-size:12px; font-weight: 800; letter-spacing: 2px;">Appel en cours</div>
+        <!-- Current call -->
+        <div class="calling-now" id="mainCallBox">
+            <div class="calling-label">Appel en cours</div>
             <div class="calling-number" id="mainCallTicket">T-000</div>
-            <div id="mainCallPatient" style="font-size:24px; font-weight:600; margin: 5px 0;">Patient: --</div>
-            <div id="mainCallCounter" style="font-size:18px; font-weight:800; color:var(--bg); background: var(--accent); display: inline-block; padding: 4px 15px; border-radius: 20px;">Guichet --</div>
+            <div class="calling-patient" id="mainCallPatient">Patient: --</div>
+            <div class="calling-guichet" id="mainCallCounter">Guichet --</div>
         </div>
         
+        <!-- Counters -->
         <div class="counters-grid" id="countersContainer"></div>
         
+        <!-- Waiting list -->
         <div class="waiting-list-section">
-            <div style="font-size:13px; color:var(--gray); text-transform:uppercase; font-weight:800;" id="lblTicketsStats">En attente (0/-- )</div>
+            <div class="waiting-header">
+                <span class="waiting-title">File d'attente</span>
+                <span class="waiting-stats" id="lblTicketsStats">0/50</span>
+            </div>
             <div class="waiting-tokens" id="waitingTokensBox"></div>
+        </div>
+
+        <!-- Mini stats -->
+        <div class="mini-stats">
+            <div class="mini-stats-title">📊 Statistiques du jour</div>
+            <div class="stat-row">
+                <span class="stat-label">Temps d'attente moyen</span>
+                <span class="stat-value" id="statAvgWait">-- min</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Clients traités</span>
+                <span class="stat-value" id="statTreated">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Taux d'absence</span>
+                <span class="stat-value" id="statAbsentRate">0%</span>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+    // ===== FIREBASE INIT =====
     const firebaseConfig = {
         apiKey: "AIzaSyBfX2hJEV035PT7F2mxQ0_gNEzON-nCXoM",
         authDomain: "mouhamed-tech-database.firebaseapp.com",
@@ -140,19 +679,106 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // ===== OFFLINE SUPPORT =====
+    const LOCAL_KEY = 'mouhamed_tech_offline';
+    let isOffline = !navigator.onLine;
+    let offlineQueue = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+
+    window.addEventListener('online', () => {
+        isOffline = false;
+        document.getElementById('offlineAlert').style.display = 'none';
+        syncOfflineData();
+    });
+    window.addEventListener('offline', () => {
+        isOffline = true;
+        document.getElementById('offlineAlert').style.display = 'block';
+    });
+
+    function saveOffline(data) {
+        offlineQueue.push(data);
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(offlineQueue));
+    }
+
+    async function syncOfflineData() {
+        if (offlineQueue.length === 0) return;
+        for (const item of offlineQueue) {
+            try {
+                await db.ref(item.path).push(item.data);
+            } catch(e) { console.error('Sync failed:', e); }
+        }
+        offlineQueue = [];
+        localStorage.removeItem(LOCAL_KEY);
+    }
+
+    // ===== UTILS =====
     function getTodayDateStr() {
         const d = new Date();
-        return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+        return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,'0') + "-" + String(d.getDate()).padStart(2,'0');
     }
-    
     const dStr = getTodayDateStr();
+
     let totalTicketsCree = 0;
     let limiteTickets = 50;
     let monNumeroAffiche = null;
     let ticketCleCourante = null;
     let statusListenerRef = null;
     let autoriserDoublonsAdmin = false;
+    let selectedPriority = 'normal';
 
+    // ===== PRIORITY SELECTOR =====
+    function selectPriority(priority) {
+        selectedPriority = priority;
+        document.querySelectorAll('.priority-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.priority === priority);
+        });
+    }
+
+    // ===== PASSWORD PROTECTION FOR PRIORITY =====
+    let pendingPriority = null;
+    const MOT_DE_PASSE_PRIORITY = "2006";
+
+    function selectPriorityWithPassword(priority) {
+        if (priority === 'normal') {
+            selectPriority('normal');
+            return;
+        }
+        pendingPriority = priority;
+        document.getElementById('passwordModal').style.display = 'flex';
+        document.getElementById('priorityPassword').value = '';
+        document.getElementById('passwordError').style.display = 'none';
+        setTimeout(() => document.getElementById('priorityPassword').focus(), 100);
+    }
+
+    function verifierMotDePasse() {
+        const input = document.getElementById('priorityPassword').value;
+        if (input === MOT_DE_PASSE_PRIORITY) {
+            document.getElementById('passwordModal').style.display = 'none';
+            selectPriority(pendingPriority);
+            pendingPriority = null;
+        } else {
+            document.getElementById('passwordError').style.display = 'block';
+            document.getElementById('priorityPassword').value = '';
+            setTimeout(() => document.getElementById('priorityPassword').focus(), 100);
+        }
+    }
+
+    function fermerModalPassword() {
+        document.getElementById('passwordModal').style.display = 'none';
+        pendingPriority = null;
+        selectPriority('normal');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const pwdInput = document.getElementById('priorityPassword');
+        if(pwdInput) {
+            pwdInput.addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') verifierMotDePasse();
+            });
+        }
+    });
+
+
+    // ===== CONFIG LISTENERS =====
     db.ref('file_attente/config_global/autoriser_doublons').on('value', snap => {
         autoriserDoublonsAdmin = snap.val() === true;
     });
@@ -162,6 +788,7 @@
         verifierLimite();
     });
 
+    // ===== GUICHETS DISPLAY =====
     db.ref('file_attente/guichets').on('value', snapshot => {
         const data = snapshot.val() || {};
         const conteneur = document.getElementById("countersContainer");
@@ -172,12 +799,16 @@
         
         for(let i=1; i<=5; i++) {
             let g = data[`guichet_${i}`] || { statut: "Libre", ticket: "Libre" };
-            let cl = (g.statut === "Appel en cours" || g.statut === "Patient Présent" || g.statut === "En pause") ? "calling" : "";
-            let affichageTicket = (g.ticket === "Libre" || g.statut === "Occupé" || g.statut === "Libre" || g.statut === "En pause") ? "Libre" : g.ticket;
-            let texteStatut = g.statut;
-            if(g.statut === "En pause") { affichageTicket = "❌"; texteStatut = "Fermé / Pause"; }
+            let cl = (g.statut === "Appel en cours") ? "calling" : "";
+            let affichageTicket = (g.ticket === "Libre") ? "—" : g.ticket;
             
-            conteneur.innerHTML += `<div class="counter-card ${cl}"><div>GUICHET 0${i}</div><div style="font-size:24px; font-weight:900; margin-top:5px; color:${affichageTicket !== 'Libre' ? 'var(--accent)' : 'var(--white)'}">${affichageTicket}</div><div style="font-size:11px; color:var(--gray); margin-top:3px;">${texteStatut}</div></div>`;
+            conteneur.innerHTML += `
+                <div class="counter-card ${cl}">
+                    <div class="c-num">GUICHET 0${i}</div>
+                    <div class="c-ticket">${affichageTicket}</div>
+                    <div class="c-status">${g.statut}</div>
+                </div>
+            `;
             
             if(g.statut === "Appel en cours") { 
                 ticketAppeleEnCeMoment = g.ticket; 
@@ -200,19 +831,44 @@
         }
     });
 
+    // ===== WAITING LIST & STATS =====
     db.ref(`file_attente/historique_jours/${dStr}/tickets`).on('value', snap => {
         totalTicketsCree = snap.numChildren();
         let tokens = [];
-        snap.forEach(c => { 
-            if(c.val().statut === "En attente") tokens.push(c.val().numero); 
+        let treated = 0, absent = 0, totalWait = 0, waitCount = 0;
+        
+        snap.forEach(c => {
+            const t = c.val();
+            if(t.statut === "En attente") {
+                tokens.push({ num: t.numero, priority: t.priority || 'normal' });
+            }
+            if(t.statut === "Terminé") treated++;
+            if(t.statut === "Absent") absent++;
+            if(t.timestamp && t.dateAppel) {
+                const wait = (t.dateAppel - t.timestamp) / 60000;
+                if(wait > 0) { totalWait += wait; waitCount++; }
+            }
         });
         
-        document.getElementById("lblTicketsStats").textContent = `En attente (${totalTicketsCree}/${limiteTickets})`;
+        // Sort by priority
+        const priorityOrder = { urgent: 0, prioritaire: 1, normal: 2 };
+        tokens.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+        
+        document.getElementById("lblTicketsStats").textContent = `${tokens.length}/${limiteTickets}`;
         const box = document.getElementById("waitingTokensBox");
-        box.innerHTML = tokens.length ? "" : "Aucun patient pour aujourd'hui";
-        tokens.forEach(t => box.innerHTML += `<div class="token">${t}</div>`);
+        box.innerHTML = tokens.length ? "" : '<span style="color:var(--gray);">Aucun patient en attente</span>';
+        tokens.forEach(t => {
+            const cls = t.priority === 'urgent' ? 'urgent' : (t.priority === 'prioritaire' ? 'prioritaire' : '');
+            box.innerHTML += `<div class="token ${cls}">${t.num}</div>`;
+        });
+        
+        // Update stats
+        document.getElementById("statTreated").textContent = treated;
+        document.getElementById("statAbsentRate").textContent = totalTicketsCree > 0 ? Math.round((absent/totalTicketsCree)*100) + '%' : '0%';
+        document.getElementById("statAvgWait").textContent = waitCount > 0 ? Math.round(totalWait/waitCount) + ' min' : '--';
         
         verifierLimite();
+        updateQueuePosition();
     });
 
     function verifierLimite() {
@@ -225,14 +881,39 @@
         }
     }
 
-    // VÉRIFICATION DYNAMIQUE ET SIGNALEMENT DU PATIENT EXISTANT
+    // ===== QUEUE POSITION =====
+    function updateQueuePosition() {
+        if(!ticketCleCourante || !monNumeroAffiche) return;
+        
+        db.ref(`file_attente/historique_jours/${dStr}/tickets`).once('value', snap => {
+            let position = 0, total = 0;
+            const myPriority = document.getElementById('lblMyPriority').textContent.toLowerCase();
+            const priorityOrder = { urgent: 0, prioritaire: 1, normal: 2 };
+            
+            snap.forEach(c => {
+                const t = c.val();
+                if(t.statut === "En attente") {
+                    total++;
+                    if(t.priority === myPriority || priorityOrder[t.priority || 'normal'] >= priorityOrder[myPriority]) {
+                        if(c.key !== ticketCleCourante) position++;
+                    }
+                }
+            });
+            
+            document.getElementById('posNum').textContent = position + 1;
+            const pct = total > 0 ? ((total - position) / total) * 100 : 100;
+            document.getElementById('queueBarFill').style.width = pct + '%';
+        });
+    }
+
+    // ===== FORM SUBMISSION =====
     function validerEtGenerer(e) {
         e.preventDefault();
         const nomInput = document.getElementById("clientName").value.trim();
         const whatsappInput = document.getElementById("clientWhatsapp").value.trim();
         const dupeBox = document.getElementById("dupeAlert");
         
-        dupeBox.style.display = "none"; // Cache l'ancienne alerte
+        dupeBox.style.display = "none";
 
         db.ref(`file_attente/historique_jours/${dStr}/tickets`).once('value', snap => {
             let ticketTrouve = null;
@@ -240,7 +921,6 @@
 
             snap.forEach(child => {
                 const tData = child.val();
-                // Le doublon est vérifié sur le Nom ET le Numéro WhatsApp simultanément
                 if (tData.whatsapp === whatsappInput && tData.nom.toLowerCase() === nomInput.toLowerCase() && tData.statut !== "Terminé") {
                     ticketTrouve = tData;
                     cleTrouvee = child.key;
@@ -248,20 +928,15 @@
             });
 
             if (ticketTrouve && !autoriserDoublonsAdmin) {
-                // SIGNALEMENT À L'ÉCRAN : L'administration refuse les doublons
-                dupeBox.innerHTML = `⚠️ <strong>Patient déjà inscrit !</strong><br>Vous possédez déjà le ticket <strong>${ticketTrouve.numero}</strong> pour aujourd'hui. Redirection vers votre suivi...`;
+                dupeBox.innerHTML = `⚠️ <strong>Déjà inscrit !</strong><br>Ticket <strong>${ticketTrouve.numero}</strong> existant. Redirection...`;
                 dupeBox.style.display = "block";
-
-                // Petit délai de 2,5 secondes pour lui laisser le temps de lire l'alerte avant d'afficher son ticket
                 setTimeout(() => {
                     dupeBox.style.display = "none";
                     ticketCleCourante = cleTrouvee;
                     monNumeroAffiche = ticketTrouve.numero;
-                    afficherEcranTicket(ticketTrouve.nom, ticketTrouve.whatsapp, ticketTrouve.numero, ticketTrouve.heure_arrivee);
+                    afficherEcranTicket(ticketTrouve.nom, ticketTrouve.whatsapp, ticketTrouve.numero, ticketTrouve.heure_arrivee, ticketTrouve.priority || 'normal');
                 }, 2500);
-
             } else {
-                // Si l'admin l'autorise ou que c'est un nouveau patient -> Nouveau ticket direct
                 creerNouveauTicket(nomInput, whatsappInput);
             }
         });
@@ -271,12 +946,10 @@
         if(totalTicketsCree >= limiteTickets) return;
         
         const d = new Date();
-        const heureArrivee = String(d.getHours()).padStart(2, '0') + "h" + String(d.getMinutes()).padStart(2, '0');
+        const heureArrivee = String(d.getHours()).padStart(2,'0') + "h" + String(d.getMinutes()).padStart(2,'0');
 
         const compteurRef = db.ref(`file_attente/historique_jours/${dStr}/compteur`);
-        compteurRef.transaction(currentValue => {
-            return (currentValue || 0) + 1;
-        }, (error, committed, snapshot) => {
+        compteurRef.transaction(currentValue => (currentValue || 0) + 1, (error, committed, snapshot) => {
             if (committed) {
                 const nouveauNumero = snapshot.val();
                 monNumeroAffiche = "T-" + String(nouveauNumero).padStart(3, '0');
@@ -286,28 +959,41 @@
                     nom: nom,
                     whatsapp: whatsapp,
                     statut: "En attente",
+                    priority: selectedPriority,
                     heure_arrivee: heureArrivee,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 };
 
-                db.ref(`file_attente/historique_jours/${dStr}/tickets`).push(structureTicket).then(res => {
-                    ticketCleCourante = res.key;
-                    afficherEcranTicket(nom, whatsapp, monNumeroAffiche, heureArrivee);
-                });
+                // Offline support
+                if(isOffline) {
+                    saveOffline({ path: `file_attente/historique_jours/${dStr}/tickets`, data: structureTicket });
+                    ticketCleCourante = 'offline_' + Date.now();
+                    afficherEcranTicket(nom, whatsapp, monNumeroAffiche, heureArrivee, selectedPriority);
+                } else {
+                    db.ref(`file_attente/historique_jours/${dStr}/tickets`).push(structureTicket).then(res => {
+                        ticketCleCourante = res.key;
+                        afficherEcranTicket(nom, whatsapp, monNumeroAffiche, heureArrivee, selectedPriority);
+                    });
+                }
             }
         });
     }
 
-    function afficherEcranTicket(nom, whatsapp, numero, heure) {
+    function afficherEcranTicket(nom, whatsapp, numero, heure, priority) {
         document.getElementById("formSection").style.display = "none";
-        document.getElementById("ticketResult").style.display = "block";
-        document.getElementById("btnCancelPresence").style.display = "block";
-        document.getElementById("btnResetForm").style.display = "block";
+        const ticketBox = document.getElementById("ticketResult");
+        ticketBox.style.display = "block";
+        ticketBox.className = 'your-ticket-box ' + (priority === 'urgent' ? 'urgent' : (priority === 'prioritaire' ? 'prioritaire' : ''));
         
         document.getElementById("lblMyTicket").textContent = numero;
         document.getElementById("lblMyName").textContent = nom;
         document.getElementById("lblMyWhatsapp").textContent = "WhatsApp : " + whatsapp;
         
+        const priorityLabels = { normal: 'Passage Normal', prioritaire: '⭐ Prioritaire', urgent: '🚨 Urgent' };
+        const priorityBadge = document.getElementById("lblMyPriority");
+        priorityBadge.textContent = priorityLabels[priority] || 'Normal';
+        priorityBadge.className = 'priority-badge ' + priority;
+
         const d = new Date();
         const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
         const dateLegible = d.toLocaleDateString('fr-FR', options);
@@ -315,13 +1001,13 @@
         
         document.getElementById("qrcode").innerHTML = "";
         const lienSuiviTV = "https://mouhamedkaraboily.github.io/mouhamed-tech/tv.html?ticket=" + encodeURIComponent(numero);
-
-        new QRCode(document.getElementById("qrcode"), { 
-            text: lienSuiviTV, 
-            width: 120, 
-            height: 120 
-        });
+        new QRCode(document.getElementById("qrcode"), { text: lienSuiviTV, width: 120, height: 120 });
         
+        document.getElementById("whatsappPreview").classList.add('show');
+        
+        document.getElementById("btnCancelPresence").style.display = "block";
+        document.getElementById("btnResetForm").style.display = "block";
+
         if(statusListenerRef) statusListenerRef.off();
 
         statusListenerRef = db.ref(`file_attente/historique_jours/${dStr}/tickets/${ticketCleCourante}/statut`);
@@ -332,7 +1018,7 @@
             if(currentStatus === "En attente") {
                 badge.style.background = "rgba(255, 149, 0, 0.15)";
                 badge.style.color = "var(--orange)";
-                badge.textContent = "⏳ Pas encore appelé (En attente...)";
+                badge.textContent = "⏳ En attente...";
                 document.getElementById("btnConfirmPresence").style.display = "none";
                 document.getElementById("btnCancelPresence").style.display = "block";
             } 
@@ -342,21 +1028,35 @@
                 
                 db.ref(`file_attente/historique_jours/${dStr}/tickets/${ticketCleCourante}/guichet`).once('value', gSnap => {
                     const guichetNum = gSnap.val() || "--";
-                    badge.innerHTML = `📢 C'EST VOTRE TOUR !<br><span style="font-size:13px;">Présentez-vous au GUICHET 0${guichetNum}</span>`;
+                    badge.innerHTML = `📢 C'EST VOTRE TOUR !<<br><span style="font-size:13px;">Présentez-vous au GUICHET 0${guichetNum}</span>`;
+                    
+                    // WhatsApp notification simulation
+                    sendWhatsAppNotification(whatsapp, numero, guichetNum);
                 });
                 
                 document.getElementById("btnConfirmPresence").style.display = "block";
                 document.getElementById("btnCancelPresence").style.display = "none";
             } 
-            else if(currentStatus === "Patient Présent" || currentStatus === "Confirmé" || currentStatus === "Terminé" || currentStatus === "Absent") {
+            else {
                 badge.style.background = "rgba(10, 124, 255, 0.15)";
                 badge.style.color = "var(--blue)";
-                badge.textContent = currentStatus === "Absent" ? "❌ Signalé Absent" : "✅ Traitement en cours / Terminé";
-                
+                badge.textContent = currentStatus === "Absent" ? "❌ Signalé Absent" : "✅ Traitement en cours";
                 document.getElementById("btnConfirmPresence").style.display = "none";
                 document.getElementById("btnCancelPresence").style.display = "none";
             }
         });
+    }
+
+    // ===== WHATSAPP NOTIFICATION (CallMeBot API) =====
+    function sendWhatsAppNotification(phone, ticket, guichet) {
+        // CallMeBot API - gratuit, nécessite une clé API
+        const apiKey = localStorage.getItem('callmebot_api_key') || '';
+        if(!apiKey) return; // Silencieux si pas configuré
+        
+        const message = `🎫 MOUHAMED TECH\nVotre ticket ${ticket} est appelé !\nPrésentez-vous au GUICHET 0${guichet}\nMerci !`;
+        const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(message)}&apikey=${apiKey}`;
+        
+        fetch(url).catch(e => console.log('WhatsApp notif failed:', e));
     }
 
     function confirmerArrivee() {
@@ -371,7 +1071,7 @@
     }
 
     function annulerPresence() {
-        if(ticketCleCourante && confirm("Voulez-vous vraiment annuler votre ticket ?")) {
+        if(ticketCleCourante && confirm("Annuler votre ticket ?")) {
             db.ref(`file_attente/historique_jours/${dStr}/tickets/${ticketCleCourante}`).update({ statut: "Terminé" });
             retourFormulaire();
         }
@@ -387,7 +1087,12 @@
         document.getElementById("btnCancelPresence").style.display = "none";
         document.getElementById("btnResetForm").style.display = "none";
         document.getElementById("formSection").style.display = "block";
+        document.getElementById("whatsappPreview").classList.remove('show');
+        selectPriority('normal');
     }
+
+    // Init
+    if(isOffline) document.getElementById('offlineAlert').style.display = 'block';
 </script>
 </body>
 </html>
