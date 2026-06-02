@@ -3,274 +3,481 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOUHAMED TECH — Écran Géant Salle d'Attente</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght=400;600;800;900&display=swap" rel="stylesheet">
+    <title>MOUHAMED TECH — Écran d'Appel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <style>
-        :root { 
-            --bg: #030a16; 
-            --card-bg: #0a1526; 
-            --blue: #0a7cff; 
-            --accent: #00e5ff; 
-            --green: #00d97e; 
-            --white: #ffffff; 
-            --gray: #64748b; 
-            --dark-gray: #1e293b; 
-        }
-        
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: 'Outfit', sans-serif; 
-        }
-        
-        body { 
-            background: var(--bg); 
-            color: var(--white); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 2vw; 
-            overflow-x: hidden;
+        :root {
+            --bg: #030a16;
+            --card-bg: #0a1526;
+            --blue: #0a7cff;
+            --accent: #00e5ff;
+            --green: #00d97e;
+            --red: #ff3b30;
+            --orange: #ff9500;
+            --purple: #af52de;
+            --gold: #ffd700;
+            --white: #ffffff;
+            --gray: #64748b;
+            --dark-gray: #1e293b;
         }
 
-        header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding-bottom: 20px; 
-            border-bottom: 3px solid rgba(255, 255, 255, 0.05); 
-            margin-bottom: 30px; 
-            flex-wrap: wrap;
-            gap: 15px;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-        
-        header h1 { 
-            font-size: clamp(1.8rem, 4vw, 2.3rem); 
-            font-weight: 900; 
-            letter-spacing: 1px; 
+
+        /* ===== THEME SYSTEM ===== */
+        body.theme-light {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --white: #0f172a;
+            --gray: #64748b;
+            --dark-gray: #e2e8f0;
         }
-        
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            border-bottom: 3px solid rgba(0,229,255,0.15);
+            background: rgba(10,21,38,0.8);
+            backdrop-filter: blur(10px);
+        }
+        header h1 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
         header h1 span { color: var(--accent); }
-        
-        .tv-clock { 
-            font-size: clamp(1rem, 2vw, 1.4rem); 
-            font-weight: 800; 
-            color: var(--accent); 
-            background: rgba(0, 229, 255, 0.05); 
-            padding: 10px 25px; 
-            border-radius: 16px; 
-            border: 1px solid rgba(0, 229, 255, 0.1); 
-            text-transform: capitalize; 
+        .tv-clock {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            font-weight: 800;
+            color: var(--accent);
+            background: rgba(0,229,255,0.05);
+            padding: 10px 25px;
+            border-radius: 16px;
+            border: 1px solid rgba(0,229,255,0.1);
         }
 
-        .main-container { 
-            display: flex; 
-            gap: 30px; 
-            flex: 1; 
-            width: 100%;
+        /* Main Container */
+        .main-container {
+            display: flex;
+            gap: 30px;
+            flex: 1;
+            padding: 30px 40px;
+            min-height: 0;
         }
 
+        /* ===== PRIORITY CALL BOX ===== */
         .priority-box {
-            flex: 1.2; 
-            background: radial-gradient(circle at top left, #0a1b3a, var(--card-bg)); 
-            border-radius: 32px; 
-            border: 2px solid rgba(0, 229, 255, 0.2); 
-            box-shadow: 0 0 50px rgba(0, 229, 255, 0.05);
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center; 
-            padding: 40px 20px; 
-            position: relative; 
-            animation: pulse-border 2s infinite alternate;
+            flex: 1.3;
+            background: radial-gradient(circle at 30% 20%, rgba(10,124,255,0.1), transparent),
+                        radial-gradient(circle at 70% 80%, rgba(0,229,255,0.05), transparent);
+            border-radius: 32px;
+            border: 2px solid rgba(0,229,255,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
         }
-        
-        @keyframes pulse-border { 
-            0% { border-color: rgba(0, 229, 255, 0.2); } 
-            100% { border-color: rgba(0, 229, 255, 0.6); } 
+        .priority-box.calling {
+            animation: pulse-glow 2s infinite alternate;
+            border-color: var(--accent);
         }
-
-        .priority-label { 
-            font-size: clamp(1.1rem, 2.5vw, 1.5rem); 
-            text-transform: uppercase; 
-            letter-spacing: 4px; 
-            color: var(--gray); 
-            font-weight: 800; 
-            margin-bottom: 10px; 
-        }
-        
-        .priority-ticket { 
-            font-size: clamp(4.5rem, 12vw, 9rem); 
-            font-weight: 900; 
-            color: var(--accent); 
-            line-height: 1.1; 
-            text-shadow: 0 0 40px rgba(0, 229, 255, 0.3); 
-        }
-        
-        .priority-patient-name { 
-            font-size: clamp(1.5rem, 4vw, 2.4rem); 
-            font-weight: 800; 
-            color: var(--white); 
-            margin-top: 5px; 
-            margin-bottom: 25px; 
-            letter-spacing: 1px; 
-            text-transform: capitalize; 
-        }
-        
-        .priority-guichet { 
-            font-size: clamp(1.4rem, 3.5vw, 2.8rem); 
-            font-weight: 800; 
-            background: var(--blue); 
-            color: white; 
-            padding: 12px 40px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 20px rgba(10, 124, 255, 0.3); 
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 20px rgba(0,229,255,0.1); border-color: rgba(0,229,255,0.2); }
+            100% { box-shadow: 0 0 60px rgba(0,229,255,0.3), 0 0 120px rgba(0,229,255,0.1); border-color: var(--accent); }
         }
 
-        .others-box { 
-            flex: 1; 
-            background: var(--card-bg); 
-            border-radius: 32px; 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            padding: 30px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 25px; 
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
         }
-        
-        .section-group { 
-            display: flex; 
-            flex-direction: column; 
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
         }
-        
-        .others-title { 
-            font-size: clamp(1.1rem, 2vw, 1.4rem); 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            color: var(--gray); 
-            margin-bottom: 15px; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
-            padding-bottom: 10px; 
-        }
-        
-        .others-title.libre-title { color: #475569; }
-
-        .guichet-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: var(--dark-gray); 
-            padding: 15px 25px; 
-            border-radius: 20px; 
-            margin-bottom: 12px; 
-            border: 1px solid rgba(255, 255, 255, 0.02); 
-        }
-        
-        .guichet-row .name-block { 
-            display: flex; 
-            flex-direction: column; 
-        }
-        
-        .guichet-row .guichet-id { 
-            font-size: clamp(1.1rem, 2vw, 1.5rem); 
-            font-weight: 800; 
-            color: var(--white); 
-        }
-        
-        .guichet-row .patient-id { 
-            font-size: clamp(0.85rem, 1.5vw, 1rem); 
-            font-weight: 600; 
-            color: var(--gray); 
-            text-transform: capitalize; 
-        }
-        
-        .guichet-row .ticket { 
-            font-size: clamp(1.4rem, 3vw, 2rem); 
-            font-weight: 900; 
-            color: var(--green); 
-            background: rgba(0, 217, 126, 0.08); 
-            padding: 4px 18px; 
-            border-radius: 12px; 
-        }
-        
-        .guichet-row .status-libre { 
-            font-size: clamp(0.85rem, 1.5vw, 1rem); 
-            font-weight: 800; 
-            color: var(--gray); 
-            background: rgba(255, 255, 255, 0.03); 
-            padding: 6px 16px; 
-            border-radius: 12px; 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            letter-spacing: 1px; 
+        .empty-state-text {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            color: var(--gray);
+            font-weight: 600;
+            line-height: 1.6;
         }
 
-        .empty-global-state { 
-            text-align: center; 
-            color: var(--gray); 
-            margin-top: 40px; 
-            font-size: 20px; 
-            font-weight: 600; 
-            width: 100%; 
+        /* Active call */
+        .call-active {
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* --- RESPONSIVE MEDIA QUERIES --- */
-        
-        @media (max-width: 850px) {
-            body { padding: 15px; }
-            .main-container { flex-direction: column; height: auto; }
-            .priority-box { padding: 30px 15px; }
-            .others-box { padding: 20px; }
+        .call-label {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            color: var(--gray);
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+        /* NUMERO DE TICKET AGRANDI */
+        .call-ticket {
+            font-size: clamp(6rem, 16vw, 12rem);
+            font-weight: 900;
+            color: var(--accent);
+            line-height: 1;
+            text-shadow: 0 0 50px rgba(0,229,255,0.3);
+            margin: 10px 0;
+        }
+        .call-ticket.prioritaire {
+            color: var(--gold);
+            text-shadow: 0 0 50px rgba(255,215,0,0.3);
+        }
+        .call-ticket.urgent {
+            color: var(--red);
+            text-shadow: 0 0 50px rgba(255,59,48,0.3);
+        }
+        /* NOM CLIENT AGRANDI */
+        .call-patient-name {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            color: var(--white);
+            margin: 10px 0 25px;
+            text-transform: capitalize;
+            letter-spacing: 1px;
+        }
+        .call-guichet {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            font-size: clamp(1.3rem, 3vw, 2.2rem);
+            font-weight: 900;
+            background: var(--blue);
+            color: white;
+            padding: 15px 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(10,124,255,0.3);
+        }
+        .call-guichet-icon {
+            font-size: 0.8em;
         }
 
-        @media (max-height: 500px) and (orientation: landscape) {
-            body { padding: 10px; }
-            header { margin-bottom: 15px; padding-bottom: 10px; }
-            .main-container { gap: 15px; }
-            .priority-box { padding: 15px; }
-            .others-box { padding: 15px; gap: 15px; }
+        /* Sound indicator */
+        .sound-indicator {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,229,255,0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .sound-indicator.active {
+            opacity: 1;
+            animation: soundPulse 0.5s infinite alternate;
+        }
+        @keyframes soundPulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        /* ===== SIDE PANEL ===== */
+        .side-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 0;
+        }
+
+        /* Section */
+        .section {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gray);
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Counter rows — AGRANDIS */
+        .guichet-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--dark-gray);
+            padding: 18px 22px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.03);
+            transition: all 0.3s;
+        }
+        .guichet-row:hover {
+            border-color: rgba(0,229,255,0.1);
+            transform: translateX(5px);
+        }
+        .guichet-row .info-block {
+            display: flex;
+            flex-direction: column;
+        }
+        /* TITRE GUICHET AGRANDI */
+        .guichet-row .g-id {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--white);
+            letter-spacing: 1px;
+        }
+        /* NOM PATIENT AGRANDI */
+        .guichet-row .g-patient {
+            font-size: 15px;
+            color: var(--gray);
+            margin-top: 4px;
+            text-transform: capitalize;
+            font-weight: 600;
+        }
+        /* NUMERO TICKET AGRANDI */
+        .guichet-row .g-ticket {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--green);
+            background: rgba(0,217,126,0.08);
+            padding: 8px 22px;
+            border-radius: 12px;
+        }
+        /* STATUS LIBRE AGRANDI */
+        .guichet-row .g-status {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--gray);
+            background: rgba(255,255,255,0.03);
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .guichet-row.calling {
+            border-color: var(--green);
+            background: rgba(0,217,126,0.05);
+            animation: rowPulse 1.5s infinite alternate;
+        }
+        .guichet-row.calling .g-ticket {
+            background: rgba(0,217,126,0.15);
+            color: var(--accent);
+        }
+        @keyframes rowPulse {
+            0% { box-shadow: 0 0 5px rgba(0,217,126,0.1); }
+            100% { box-shadow: 0 0 20px rgba(0,217,126,0.2); }
+        }
+
+        /* Waiting list — AGRANDIE */
+        .waiting-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .waiting-list::-webkit-scrollbar { width: 4px; }
+        .waiting-list::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 4px; }
+
+        /* TOKEN AGRANDI */
+        .w-token {
+            background: rgba(255,255,255,0.05);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--accent);
+            border: 1px solid rgba(0,229,255,0.1);
+        }
+        .w-token.prioritaire {
+            background: rgba(255,215,0,0.1);
+            color: var(--gold);
+            border-color: rgba(255,215,0,0.3);
+        }
+        .w-token.urgent {
+            background: rgba(255,59,48,0.1);
+            color: var(--red);
+            border-color: rgba(255,59,48,0.3);
+            animation: urgentBlink 1s infinite;
+        }
+        @keyframes urgentBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            padding: 15px 25px;
+            background: rgba(10,21,38,0.9);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .stat-item .stat-icon { font-size: 18px; }
+        .stat-item .stat-label { color: var(--gray); font-weight: 600; }
+        .stat-item .stat-value { color: var(--accent); font-weight: 800; font-size: 16px; }
+
+        /* Ticker */
+        .ticker {
+            background: linear-gradient(90deg, var(--blue), var(--accent));
+            color: var(--bg);
+            padding: 12px 0;
+            font-size: 16px;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+        }
+        .ticker-content {
+            display: inline-block;
+            animation: scroll 25s linear infinite;
+            padding-left: 100%;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-container { flex-direction: column; padding: 20px; }
+            .priority-box { padding: 30px 20px; }
+            .side-panel { flex: none; }
+            header { padding: 15px 20px; }
+        }
+        @media (max-height: 700px) {
+            .main-container { padding: 20px; }
+            .priority-box { padding: 20px; }
+            .call-ticket { font-size: 4rem; }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
 
     <header>
         <h1>MOUHAMED<span>TECH</span> — Gestion de File</h1>
-        <div class="tv-clock" id="tvClock">Chargement du calendrier...</div>
+        <div class="tv-clock" id="tvClock">Chargement...</div>
     </header>
 
     <div class="main-container">
+        <!-- MAIN CALL DISPLAY -->
         <div class="priority-box" id="priorityContainer">
-            <div class="empty-state" id="txtEmpty" style="font-size: clamp(1.2rem, 3vw, 1.6rem); color: var(--gray); font-weight: 600;">Aucun appel en cours.<br>Veuillez patienter...</div>
-            <div id="priorityContent" style="display: none; width: 100%;">
-                <div class="priority-label">Numéro Demandé</div>
-                <div class="priority-ticket" id="lblPriorityTicket">🔑 —</div>
-                <div class="priority-patient-name" id="lblPriorityName">—</div>
-                <div style="display: flex; justify-content: center;">
-                    <div class="priority-guichet" id="lblPriorityGuichet">GUICHET 00</div>
+            <div class="sound-indicator" id="soundIndicator">
+                🔊 Annonce en cours...
+            </div>
+
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">⏳</div>
+                <div class="empty-state-text">
+                    Aucun appel en cours<br>
+                    <span style="font-size:0.8em;opacity:0.6;">Veuillez patienter...</span>
+                </div>
+            </div>
+
+            <div class="call-active" id="callActive" style="display:none;">
+                <div class="call-label">🔔 Numéro Demandé</div>
+                <div class="call-ticket" id="lblPriorityTicket">T-001</div>
+                <div class="call-patient-name" id="lblPriorityName">Mouhamed Karaboily</div>
+                <div class="call-guichet">
+                    <span class="call-guichet-icon">🎯</span>
+                    <span id="lblPriorityGuichet">GUICHET 01</span>
                 </div>
             </div>
         </div>
 
-        <div class="others-box" id="sidePanelsContainer">
-            <div class="section-group" id="groupActifs" style="display: none;">
-                <div class="others-title">Guichets Actifs</div>
-                <div id="listActifsGuichets"></div>
+        <!-- SIDE PANEL -->
+        <div class="side-panel" id="sidePanel">
+            <!-- Active counters -->
+            <div class="section" id="sectionActifs">
+                <div class="section-title">🟢 Guichets Actifs</div>
+                <div id="listActifs"></div>
             </div>
 
-            <div class="section-group" id="groupLibres" style="display: none;">
-                <div class="others-title libre-title">Guichets Libres</div>
-                <div id="listLibresGuichets"></div>
+            <!-- Free counters -->
+            <div class="section" id="sectionLibres">
+                <div class="section-title" style="color:var(--gray);">⚪ Guichets Libres</div>
+                <div id="listLibres"></div>
             </div>
-            
-            <div class="empty-global-state" id="msgNoGuichet" style="display: none;">
-                Tous les guichets sont hors ligne.
+
+            <!-- Waiting list -->
+            <div class="section">
+                <div class="section-title">📋 File d'Attente</div>
+                <div class="waiting-list" id="waitingList">
+                    <span style="color:var(--gray);font-size:14px;">Aucun patient en attente</span>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-icon">👥</span>
+            <span class="stat-label">En attente:</span>
+            <span class="stat-value" id="statWaiting">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-icon">✅</span>
+            <span class="stat-label">Traités:</span>
+            <span class="stat-value" id="statTreated">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-icon">⏱️</span>
+            <span class="stat-label">Attente moy:</span>
+            <span class="stat-value" id="statAvgWait">-- min</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-icon">🎯</span>
+            <span class="stat-label">Guichets:</span>
+            <span class="stat-value" id="statCounters">0/5 actifs</span>
+        </div>
+    </div>
+
+    <!-- TICKER -->
+    <div class="ticker" id="ticker">
+        <div class="ticker-content" id="tickerContent">
+            Bienvenue chez MOUHAMED TECH — Veuillez prendre un ticket — Merci de votre patience —
         </div>
     </div>
 
@@ -288,131 +495,172 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // ===== CLOCK =====
         function clockTv() {
             const d = new Date();
             const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            document.getElementById('tvClock').textContent = `${d.toLocaleDateString('fr-FR', options)} — ${d.toLocaleTimeString('fr-FR')}`;
+            document.getElementById('tvClock').textContent =
+                `${d.toLocaleDateString('fr-FR', options)} — ${d.toLocaleTimeString('fr-FR')}`;
         }
         setInterval(clockTv, 1000);
         clockTv();
 
+        // ===== AUDIO SYSTEM =====
         let memoireForceVocal = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        let audioCtx = null;
 
-        // Génère électroniquement un bip carillon professionnel de type "Ding-Dong"
-        function jouerCarillonPro(callback) {
-            try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) { if(callback) callback(); return; }
-                
-                const ctx = new AudioContext();
-                
-                // Première note (Le "Ding")
-                const osc1 = ctx.createOscillator();
-                const gain1 = ctx.createGain();
-                osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(587.33, ctx.currentTime); // Note Ré5 (D5)
-                gain1.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-                osc1.connect(gain1);
-                gain1.connect(ctx.destination);
-                osc1.start();
-                osc1.stop(ctx.currentTime + 0.4);
-                
-                // Deuxième note (Le "Dong" - 0.25s plus tard)
-                setTimeout(() => {
-                    const osc2 = ctx.createOscillator();
-                    const gain2 = ctx.createGain();
-                    osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(440.00, ctx.currentTime); // Note La4 (A4)
-                    gain2.gain.setValueAtTime(0.3, ctx.currentTime);
-                    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-                    osc2.connect(gain2);
-                    gain2.connect(ctx.destination);
-                    osc2.start();
-                    osc2.stop(ctx.currentTime + 0.5);
-                }, 250);
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
 
-                // Lance la synthèse vocale juste après la fin du carillon (0.75 seconde au total)
-                setTimeout(() => {
-                    if (callback) callback();
-                }, 750);
+        // Carillon professionnel "Ding-Dong"
+        function jouerCarillon(callback) {
+            initAudio();
+            const now = audioCtx.currentTime;
 
-            } catch (e) {
+            // Ding (Ré5 - 587.33Hz)
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(587.33, now);
+            gain1.gain.setValueAtTime(0.3, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.5);
+
+            // Dong (La4 - 440Hz) - 0.4s plus tard
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(440.00, now + 0.4);
+            gain2.gain.setValueAtTime(0.3, now + 0.4);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            osc2.start(now + 0.4);
+            osc2.stop(now + 0.9);
+
+            // Callback après le carillon
+            setTimeout(() => {
                 if (callback) callback();
-            }
+            }, 1000);
         }
 
-        function lireAnnonceVocale(ticketNum, guichetId, patientName) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                
-                // Déclenche d'abord le carillon pro, puis lit le texte dans le callback
-                jouerCarillonPro(() => {
-                    const nomClient = (patientName && patientName.trim() !== "") ? `, Monsieur ou Madame ${patientName},` : "";
-                    const phrase = `Numéro ${ticketNum}${nomClient}, veuillez vous présenter au guichet ${guichetId}.`;
-                    
-                    const message = new SpeechSynthesisUtterance(phrase);
-                    message.lang = 'fr-FR';
-                    message.rate = 0.95;
-                    window.speechSynthesis.speak(message);
-                });
-            }
+        // Synthèse vocale
+        function lireAnnonce(ticketNum, guichetId, patientName, priority) {
+            if (!('speechSynthesis' in window)) return;
+
+            window.speechSynthesis.cancel();
+
+            const nomClient = (patientName && patientName.trim() !== "")
+                ? `, Monsieur ou Madame ${patientName},`
+                : "";
+
+            const prioriteText = priority === 'urgent'
+                ? " en urgence"
+                : (priority === 'prioritaire' ? " en priorité" : "");
+
+            const phrase = `Numéro ${ticketNum}${nomClient}${prioriteText}, veuillez vous présenter au guichet ${guichetId}.`;
+
+            const utterance = new SpeechSynthesisUtterance(phrase);
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            // Montrer l'indicateur sonore
+            const indicator = document.getElementById('soundIndicator');
+            indicator.classList.add('active');
+
+            utterance.onend = () => {
+                indicator.classList.remove('active');
+            };
+
+            window.speechSynthesis.speak(utterance);
         }
 
+        // ===== MAIN DATA LISTENER =====
         db.ref('file_attente/guichets').on('value', snap => {
             const guichetsData = snap.val() || {};
-            
+
             let guichetPrioritaireId = null;
             let ticketPrioritaireNum = null;
             let nomPrioritairePatient = "";
+            let priorityPrioritaire = "normal";
             let plusRecentTimestamp = 0;
             let declencherVocal = false;
 
+            // Analyse des guichets
             for (let i = 1; i <= 5; i++) {
-                let g = guichetsData[`guichet_${i}`] || { statut: "Libre", ticket: "Libre", nom: "" };
-                
+                let g = guichetsData[`guichet_${i}`] || {
+                    statut: "Libre",
+                    ticket: "Libre",
+                    nom: "",
+                    priority: "normal"
+                };
+
                 if (g.statut === "Appel en cours" && g.ticket !== "Libre") {
                     let ts = g.date_action || 1;
-                    
+
                     if (ts > plusRecentTimestamp) {
                         plusRecentTimestamp = ts;
                         guichetPrioritaireId = i;
                         ticketPrioritaireNum = g.ticket;
                         nomPrioritairePatient = g.nom || "";
+                        priorityPrioritaire = g.priority || "normal";
                     }
 
+                    // Détection changement pour vocal
                     if (g.force_vocal && g.force_vocal !== memoireForceVocal[i]) {
                         memoireForceVocal[i] = g.force_vocal;
-                        declencherVocal = true; 
+                        declencherVocal = true;
                     }
                 }
             }
 
-            const emptyBlock = document.getElementById("txtEmpty");
-            const contentBlock = document.getElementById("priorityContent");
+            // ===== UPDATE MAIN DISPLAY =====
+            const emptyBlock = document.getElementById("emptyState");
+            const callBlock = document.getElementById("callActive");
+            const container = document.getElementById("priorityContainer");
 
             if (guichetPrioritaireId !== null) {
                 emptyBlock.style.display = "none";
-                contentBlock.style.display = "block";
+                callBlock.style.display = "block";
+                container.classList.add('calling');
 
-                document.getElementById("lblPriorityTicket").textContent = ticketPrioritaireNum;
+                const ticketEl = document.getElementById("lblPriorityTicket");
+                ticketEl.textContent = ticketPrioritaireNum;
+                ticketEl.className = 'call-ticket ' + priorityPrioritaire;
+
                 document.getElementById("lblPriorityName").textContent = nomPrioritairePatient;
                 document.getElementById("lblPriorityGuichet").textContent = `GUICHET 0${guichetPrioritaireId}`;
 
+                // Déclencher le carillon + vocal
                 if (declencherVocal) {
-                    lireAnnonceVocale(ticketPrioritaireNum, guichetPrioritaireId, nomPrioritairePatient);
+                    // Premier clic nécessaire pour activer l'audio
+                    jouerCarillon(() => {
+                        lireAnnonce(ticketPrioritaireNum, guichetPrioritaireId, nomPrioritairePatient, priorityPrioritaire);
+                    });
                 }
             } else {
                 emptyBlock.style.display = "block";
-                contentBlock.style.display = "none";
+                callBlock.style.display = "none";
+                container.classList.remove('calling');
             }
 
-            const containerActifs = document.getElementById("listActifsGuichets");
-            const containerLibres = document.getElementById("listLibresGuichets");
-            
-            const panelGroupActifs = document.getElementById("groupActifs");
-            const panelGroupLibres = document.getElementById("groupLibres");
-            const msgNoGuichet = document.getElementById("msgNoGuichet");
+            // ===== UPDATE SIDE PANELS =====
+            updateSidePanels(guichetsData);
+        });
+
+        function updateSidePanels(guichetsData) {
+            const containerActifs = document.getElementById("listActifs");
+            const containerLibres = document.getElementById("listLibres");
+            const sectionActifs = document.getElementById("sectionActifs");
+            const sectionLibres = document.getElementById("sectionLibres");
 
             containerActifs.innerHTML = "";
             containerLibres.innerHTML = "";
@@ -421,50 +669,123 @@
             let nbLibres = 0;
 
             for (let i = 1; i <= 5; i++) {
-                let g = guichetsData[`guichet_${i}`] || { statut: "Libre", ticket: "Libre", nom: "" };
-                
+                let g = guichetsData[`guichet_${i}`] || {
+                    statut: "Libre",
+                    ticket: "Libre",
+                    nom: "",
+                    priority: "normal"
+                };
+
+                const isCalling = g.statut === "Appel en cours" && g.ticket !== "Libre";
+
                 if (g.ticket !== "Libre") {
                     nbActifs++;
-                    let displayNomMini = g.nom ? g.nom : "En cours";
+                    const displayNom = g.nom ? g.nom : "En cours";
+                    const priorityClass = g.priority === 'urgent' ? 'urgent' : (g.priority === 'prioritaire' ? 'prioritaire' : '');
+
                     containerActifs.innerHTML += `
-                        <div class="guichet-row">
-                            <div class="name-block">
-                                <div class="guichet-id">Guichet 0${i}</div>
-                                <div class="patient-id">${displayNomMini}</div>
+                        <div class="guichet-row ${isCalling ? 'calling' : ''}">
+                            <div class="info-block">
+                                <div class="g-id">Guichet 0${i}</div>
+                                <div class="g-patient">${displayNom}</div>
                             </div>
-                            <div class="ticket">${g.ticket}</div>
+                            <div class="g-ticket ${priorityClass}">${g.ticket}</div>
                         </div>
                     `;
                 } else {
                     nbLibres++;
                     containerLibres.innerHTML += `
-                        <div class="guichet-row" style="opacity: 0.65;">
-                            <div class="name-block">
-                                <div class="guichet-id" style="color: var(--gray);">Guichet 0${i}</div>
-                                <div class="patient-id">Disponible</div>
+                        <div class="guichet-row" style="opacity:0.6;">
+                            <div class="info-block">
+                                <div class="g-id" style="color:var(--gray);">Guichet 0${i}</div>
+                                <div class="g-patient">Disponible</div>
                             </div>
-                            <div class="status-libre">LIBRE</div>
+                            <div class="g-status">LIBRE</div>
                         </div>
                     `;
                 }
             }
 
-            if (nbActifs > 0) {
-                panelGroupActifs.style.display = "flex";
+            sectionActifs.style.display = nbActifs > 0 ? "block" : "none";
+            sectionLibres.style.display = nbLibres > 0 ? "block" : "none";
+
+            document.getElementById('statCounters').textContent = `${nbActifs}/5 actifs`;
+        }
+
+        // ===== WAITING LIST =====
+        function getTodayDateStr() {
+            const d = new Date();
+            return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+        }
+
+        db.ref(`file_attente/historique_jours/${getTodayDateStr()}/tickets`).on('value', snap => {
+            const waitingList = document.getElementById("waitingList");
+            const tickets = snap.val() || {};
+
+            let waiting = [];
+            let treated = 0;
+            let absent = 0;
+            let totalWait = 0;
+            let waitCount = 0;
+
+            Object.entries(tickets).forEach(([_, t]) => {
+                if (t.statut === "En attente") {
+                    waiting.push({
+                        num: t.numero,
+                        priority: t.priority || 'normal'
+                    });
+                }
+                if (t.statut === "Terminé") treated++;
+                if (t.statut === "Absent") absent++;
+                if (t.timestamp && t.dateAppel) {
+                    const wait = (t.dateAppel - t.timestamp) / 60000;
+                    if (wait > 0) { totalWait += wait; waitCount++; }
+                }
+            });
+
+            // Sort by priority
+            const priorityOrder = { urgent: 0, prioritaire: 1, normal: 2 };
+            waiting.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
+            if (waiting.length === 0) {
+                waitingList.innerHTML = '<span style="color:var(--gray);font-size:14px;">Aucun patient en attente</span>';
             } else {
-                panelGroupActifs.style.display = "none";
+                waitingList.innerHTML = waiting.map(t => {
+                    const cls = t.priority === 'urgent' ? 'urgent' : (t.priority === 'prioritaire' ? 'prioritaire' : '');
+                    return `<div class="w-token ${cls}">${t.num}</div>`;
+                }).join('');
             }
 
-            if (nbLibres > 0) {
-                panelGroupLibres.style.display = "flex";
+            // Update ticker
+            const tickerContent = document.getElementById("tickerContent");
+            if (waiting.length > 0) {
+                const liste = waiting.map(t => t.num).join('  •  ');
+                tickerContent.textContent = `EN ATTENTE : ${liste}  •  `;
             } else {
-                panelGroupLibres.style.display = "none";
+                tickerContent.textContent = "Bienvenue chez MOUHAMED TECH — Veuillez prendre un ticket — Merci de votre patience — ";
             }
 
-            if (nbActifs === 0 && nbLibres === 0) {
-                msgNoGuichet.style.display = "block";
-            } else {
-                msgNoGuichet.style.display = "none";
+            // Update stats
+            document.getElementById("statWaiting").textContent = waiting.length;
+            document.getElementById("statTreated").textContent = treated;
+            document.getElementById("statAvgWait").textContent = waitCount > 0
+                ? Math.round(totalWait / waitCount) + ' min'
+                : '-- min';
+        });
+
+        // ===== ACTIVER AUDIO AU PREMIER CLIC =====
+        document.addEventListener('click', () => {
+            initAudio();
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: true });
+
+        // Keyboard shortcut for mute
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'm' || e.key === 'M') {
+                window.speechSynthesis.cancel();
+                document.getElementById('soundIndicator').classList.remove('active');
             }
         });
     </script>
