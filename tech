@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOUHAMED TECH — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060d1f;--surf:#0d1830;--surf2:#111f3a;--bord:rgba(255,255,255,0.07);--blue:#0a7cff;--acc:#00e5ff;--green:#00d97e;--yel:#f0c400;--red:#ff4d4d;--w:#fff;--gray:rgba(255,255,255,0.45);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--w);min-height:100vh;}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;}
+.lbox{background:var(--surf);border:1px solid var(--bord);border-radius:24px;padding:40px;width:100%;max-width:400px;text-align:center;}
+.llogo{font-size:24px;font-weight:900;margin-bottom:4px;}.llogo span{color:var(--acc);}
+.lsub{font-size:13px;color:var(--gray);margin-bottom:28px;}
+.lfield{margin-bottom:14px;}
+.lfield input{width:100%;padding:14px 16px;background:var(--surf2);border:1px solid var(--bord);border-radius:12px;font-family:inherit;font-size:14px;color:var(--w);outline:none;transition:border-color 0.2s;}
+.lfield input:focus{border-color:var(--blue);}
+.btn-login{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;}
+.btn-login:disabled{opacity:0.6;cursor:not-allowed;}
+.lerr{color:var(--red);font-size:13px;margin-top:12px;display:none;padding:10px;background:rgba(255,77,77,0.1);border-radius:10px;border:1px solid rgba(255,77,77,0.2);}
+.linfo{font-size:12px;color:var(--gray);margin-top:14px;line-height:1.5;}
+
+/* APP */
+#adminApp{display:none;}
+.topbar{position:fixed;top:0;left:0;right:0;height:64px;background:var(--surf);border-bottom:1px solid var(--bord);display:flex;align-items:center;padding:0 24px;justify-content:space-between;z-index:100;}
+.tlogo{font-size:18px;font-weight:900;}.tlogo span{color:var(--acc);}
+.tright{display:flex;align-items:center;gap:14px;}
+.cstatus{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--gray);}
+.cdot{width:9px;height:9px;border-radius:50%;background:var(--yel);transition:background 0.4s;}
+.cdot.on{background:var(--green);animation:blink 2s infinite;}.cdot.off{background:var(--red);}
+.user-info{font-size:11px;color:var(--gray);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+.btn-out{padding:7px 16px;border-radius:50px;border:1px solid var(--bord);background:transparent;color:var(--gray);font-family:inherit;font-size:13px;cursor:pointer;}
+.btn-out:hover{border-color:var(--red);color:var(--red);}
+.main{padding:80px 20px 40px;max-width:1100px;margin:0 auto;}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+@media(max-width:680px){.sgrid{grid-template-columns:1fr 1fr;}}
+.scard{background:var(--surf);border:1px solid var(--bord);border-radius:18px;padding:20px;}
+.slabel{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+.sval{font-size:28px;font-weight:900;}
+.s-tot .sval{color:var(--w);}.s-att .sval{color:var(--yel);}.s-en .sval{color:var(--blue);}.s-fin .sval{color:var(--green);}
+.toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.sbox{flex:1;min-width:190px;position:relative;}
+.sbox input{width:100%;padding:11px 16px 11px 40px;background:var(--surf);border:1px solid var(--bord);border-radius:12px;font-family:inherit;font-size:13px;color:var(--w);outline:none;}
+.sbox input:focus{border-color:var(--blue);}
+.sbox::before{content:'&#128269;';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;}
+.fbtn{padding:10px 16px;border-radius:12px;border:1px solid var(--bord);background:var(--surf);color:var(--gray);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.fbtn.act{background:var(--blue);border-color:var(--blue);color:#fff;}
+.ssort{padding:10px 12px;border-radius:12px;border:1px solid var(--bord);background:var(--surf);color:var(--w);font-family:inherit;font-size:12px;outline:none;cursor:pointer;}
+.nbadge{background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:50px;margin-left:5px;display:none;}
+#list{display:flex;flex-direction:column;gap:14px;}
+.fcard{background:var(--surf);border:1px solid var(--bord);border-radius:20px;padding:20px;position:relative;overflow:hidden;transition:border-color 0.2s;}
+.fcard::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;}
+.fcard.att::before{background:var(--yel);}.fcard.enc::before{background:var(--blue);}.fcard.fin::before{background:var(--green);}
+.fcard:hover{border-color:rgba(255,255,255,0.14);}
+.ftop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px;}
+.fname{font-size:16px;font-weight:800;}.fdate{font-size:11px;color:var(--gray);margin-top:2px;}
+.fprix{font-size:13px;font-weight:800;color:var(--acc);text-align:right;flex-shrink:0;}
+.fmeta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px;}
+.mtag{display:inline-flex;align-items:center;gap:4px;background:var(--surf2);border:1px solid var(--bord);padding:4px 10px;border-radius:50px;font-size:11px;color:var(--gray);}
+.mtag b{color:var(--w);}
+.fpresta{font-size:11px;color:var(--gray);font-weight:600;margin-bottom:8px;}
+.fprob{background:var(--surf2);border-left:3px solid var(--blue);padding:10px 14px;border-radius:4px 12px 12px 4px;font-size:12.5px;color:rgba(255,255,255,0.82);margin-bottom:13px;line-height:1.5;}
+.factions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.bst{padding:7px 14px;border-radius:50px;font-size:11px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;}
+.bst-att{background:rgba(240,196,0,0.14);color:var(--yel);border:1px solid rgba(240,196,0,0.3);}
+.bst-enc{background:rgba(10,124,255,0.14);color:var(--blue);border:1px solid rgba(10,124,255,0.3);}
+.bst-fin{background:rgba(0,217,126,0.14);color:var(--green);border:1px solid rgba(0,217,126,0.3);}
+.bst-att:hover{background:rgba(240,196,0,0.28);}.bst-enc:hover{background:rgba(10,124,255,0.28);}.bst-fin:hover{background:rgba(0,217,126,0.28);}
+.bwa{padding:7px 14px;border-radius:50px;font-size:11px;font-weight:700;background:rgba(0,217,126,0.14);color:var(--green);border:1px solid rgba(0,217,126,0.3);cursor:pointer;text-decoration:none;font-family:inherit;display:inline-flex;align-items:center;gap:4px;}
+.bdel{margin-left:auto;padding:7px 12px;border-radius:50px;font-size:11px;font-weight:700;background:rgba(255,77,77,0.1);color:var(--red);border:1px solid rgba(255,77,77,0.2);cursor:pointer;font-family:inherit;}
+.bdel:hover{background:rgba(255,77,77,0.25);}
+.note-area{margin-top:12px;width:100%;padding:9px 13px;background:var(--surf2);border:1px solid var(--bord);border-radius:12px;font-family:inherit;font-size:12px;color:var(--w);outline:none;resize:none;}
+.note-area:focus{border-color:var(--blue);}
+.btn-note{margin-top:5px;padding:6px 14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.empty{text-align:center;padding:55px 20px;color:var(--gray);}
+.empty .ico{font-size:44px;margin-bottom:10px;}
+.loading{text-align:center;padding:50px 20px;color:var(--gray);}
+.spin{width:30px;height:30px;border:3px solid var(--bord);border-top-color:var(--blue);border-radius:50%;animation:sp 0.8s linear infinite;margin:0 auto 12px;}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--surf);border:1px solid var(--bord);color:#fff;padding:12px 22px;border-radius:50px;font-size:13px;font-weight:700;z-index:9999;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 8px 28px rgba(0,0,0,0.4);pointer-events:none;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN : email + mot de passe Firebase Auth -->
+<div id="loginScreen">
+  <div class="lbox">
+    <div class="llogo">MOUHAMED<span>TECH</span></div>
+    <div class="lsub">Administration — Connexion s&#233;curis&#233;e</div>
+    <div class="lfield"><input type="email" id="loginEmail" placeholder="Email admin" autocomplete="email"></div>
+    <div class="lfield"><input type="password" id="loginPass" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')checkLogin()"></div>
+    <button class="btn-login" id="btnLogin" onclick="checkLogin()">&#128272; Se connecter</button>
+    <div class="lerr" id="lerr"></div>
+    <div class="linfo">Connexion s&#233;curis&#233;e via Firebase Authentication.<br>Seul l'administrateur autoris&#233; peut acc&#233;der.</div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <div class="topbar">
+    <div class="tlogo">MOUHAMED<span>TECH</span> <span style="font-size:12px;font-weight:600;color:var(--gray);">Admin</span></div>
+    <div class="tright">
+      <div class="cstatus"><div class="cdot" id="cdot"></div><span id="clabel">Connexion...</span></div>
+      <span class="user-info" id="userInfo"></span>
+      <button class="btn-out" onclick="logout()">D&#233;connexion</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="sgrid">
+      <div class="scard s-tot"><div class="slabel">Total fiches</div><div class="sval" id="stot">-</div></div>
+      <div class="scard s-att"><div class="slabel">En attente</div><div class="sval" id="satt">-</div></div>
+      <div class="scard s-en"><div class="slabel">En cours</div><div class="sval" id="senc">-</div></div>
+      <div class="scard s-fin"><div class="slabel">Termin&#233;s</div><div class="sval" id="sfin">-</div></div>
+    </div>
+    <div class="toolbar">
+      <div class="sbox"><input type="text" id="searchInput" placeholder="Rechercher nom, t&#233;l&#233;phone..." oninput="render()"></div>
+      <button class="fbtn act" onclick="setF('tous',this)">Tous <span class="nbadge" id="nbadge">0</span></button>
+      <button class="fbtn" onclick="setF('En attente',this)">&#9203; Attente</button>
+      <button class="fbtn" onclick="setF('En cours',this)">&#128295; En cours</button>
+      <button class="fbtn" onclick="setF('Termin\u00e9',this)">&#10003; Termin&#233;</button>
+      <select class="ssort" id="sortSel" onchange="render()">
+        <option value="new">Plus r&#233;cent</option>
+        <option value="old">Plus ancien</option>
+        <option value="az">Nom A-Z</option>
+      </select>
+    </div>
+    <div id="list"><div class="loading"><div class="spin"></div><p>Connexion Firebase...</p></div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* ===== FIREBASE INIT ===== */
+firebase.initializeApp({
+  apiKey:"AIzaSyBfX2hJEV035PT7F2mxQ0_gNEzON-nCXoM",
+  authDomain:"mouhamed-tech-database.firebaseapp.com",
+  databaseURL:"https://mouhamed-tech-database-default-rtdb.firebaseio.com",
+  projectId:"mouhamed-tech-database",
+  storageBucket:"mouhamed-tech-database.firebasestorage.app",
+  messagingSenderId:"178632163158",
+  appId:"1:178632163158:web:6b48bcfb12e1c37fe3e0f7"
+});
+var auth = firebase.auth();
+var db   = firebase.database();
+var ref  = db.ref("fiches");
+
+/* ===== STATE ===== */
+var fiches=[], filtre="tous", firstLoad=true, prevCount=0, dbListener=null;
+
+/* ===== AUTH OBSERVER ===== */
+auth.onAuthStateChanged(function(user){
+  if(user){
+    /* Utilisateur connecte → afficher admin */
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("adminApp").style.display="block";
+    document.getElementById("userInfo").textContent=user.email;
+    demarrer();
+  } else {
+    /* Deconnecte → afficher login */
+    document.getElementById("loginScreen").style.display="flex";
+    document.getElementById("adminApp").style.display="none";
+    if(dbListener){ ref.off("value",dbListener); dbListener=null; }
+    firstLoad=true; prevCount=0; fiches=[];
+  }
+});
+
+/* ===== LOGIN avec Firebase Auth ===== */
+function checkLogin(){
+  var email=document.getElementById("loginEmail").value.trim();
+  var pass=document.getElementById("loginPass").value;
+  var btn=document.getElementById("btnLogin");
+  var err=document.getElementById("lerr");
+  err.style.display="none";
+  if(!email||!pass){err.textContent="Entrez votre email et mot de passe.";err.style.display="block";return;}
+  btn.disabled=true; btn.textContent="Connexion...";
+  auth.signInWithEmailAndPassword(email,pass)
+    .then(function(){
+      btn.disabled=false; btn.textContent="Se connecter";
+      document.getElementById("loginEmail").value="";
+      document.getElementById("loginPass").value="";
+    })
+    .catch(function(e){
+      btn.disabled=false; btn.textContent="Se connecter";
+      var msg="Erreur de connexion.";
+      if(e.code==="auth/wrong-password"||e.code==="auth/invalid-credential") msg="Email ou mot de passe incorrect.";
+      else if(e.code==="auth/user-not-found") msg="Aucun compte trouve pour cet email.";
+      else if(e.code==="auth/invalid-email") msg="Format d'email invalide.";
+      else if(e.code==="auth/too-many-requests") msg="Trop de tentatives. Reessayez dans quelques minutes.";
+      err.textContent=msg; err.style.display="block";
+    });
+}
+
+function logout(){
+  auth.signOut().catch(function(e){toast("Erreur deconnexion : "+e.message);});
+}
+
+/* ===== FIREBASE REALTIME ===== */
+function demarrer(){
+  db.ref(".info/connected").on("value",function(snap){
+    var dot=document.getElementById("cdot"), lbl=document.getElementById("clabel");
+    if(snap.val()===true){dot.className="cdot on";lbl.textContent="Temps reel actif";}
+    else{dot.className="cdot off";lbl.textContent="Hors ligne";}
+  });
+  dbListener=function(snap){
+    var data=snap.val(); fiches=[];
+    if(data) Object.entries(data).forEach(function(e){fiches.push(Object.assign({id:e[0]},e[1]));});
+    fiches.sort(function(a,b){return (b.timestamp||0)-(a.timestamp||0);});
+    if(!firstLoad&&fiches.length>prevCount){
+      var n=fiches.length-prevCount;
+      toast("&#128276; "+n+" nouvelle(s) fiche(s) !");
+      var b=document.getElementById("nbadge"); b.textContent=n; b.style.display="inline";
+    }
+    firstLoad=false; prevCount=fiches.length;
+    render();
+  };
+  ref.on("value",dbListener);
+}
+
+/* ===== RENDER ===== */
+function setF(f,btn){
+  filtre=f;
+  document.querySelectorAll(".fbtn").forEach(function(b){b.classList.remove("act");});
+  btn.classList.add("act");
+  if(f==="tous") document.getElementById("nbadge").style.display="none";
+  render();
+}
+function toast(msg){
+  var el=document.getElementById("toast");
+  el.innerHTML=msg; el.classList.add("show");
+  setTimeout(function(){el.classList.remove("show");},4000);
+}
+function render(){
+  var list=[...fiches];
+  var q=((document.getElementById("searchInput")||{}).value||"").toLowerCase();
+  var sort=((document.getElementById("sortSel")||{}).value)||"new";
+  if(filtre!=="tous") list=list.filter(function(f){return f.statut===filtre;});
+  if(q) list=list.filter(function(f){
+    return (f.nom||"").toLowerCase().includes(q)||(f.telephone||"").includes(q)||
+           (f.email||"").toLowerCase().includes(q)||(f.probleme||"").toLowerCase().includes(q);
+  });
+  if(sort==="old") list.sort(function(a,b){return (a.timestamp||0)-(b.timestamp||0);});
+  else if(sort==="az") list.sort(function(a,b){return (a.nom||"").localeCompare(b.nom||"");});
+  document.getElementById("stot").textContent=fiches.length;
+  document.getElementById("satt").textContent=fiches.filter(function(f){return f.statut==="En attente";}).length;
+  document.getElementById("senc").textContent=fiches.filter(function(f){return f.statut==="En cours";}).length;
+  document.getElementById("sfin").textContent=fiches.filter(function(f){return f.statut==="Termin\u00e9";}).length;
+  var cont=document.getElementById("list");
+  if(list.length===0){
+    cont.innerHTML='<div class="empty"><div class="ico">&#128194;</div><p>Aucune fiche trouv\u00e9e.</p></div>';
+    return;
+  }
+  cont.innerHTML=list.map(function(f){
+    var cls=f.statut==="En attente"?"att":f.statut==="En cours"?"enc":"fin";
+    var prixAff=f.prix?f.prix.replace(/-/g," - ")+" FCFA":"–";
+    var waPhone=(f.telephone||"").replace(/[\s\-().]/g,"");
+    var waMsg=encodeURIComponent("Bonjour "+f.nom+",\n\nMOUHAMED TECH vous informe :\n\nStatut de votre dossier : *"+f.statut+"*\n\nMerci de votre confiance.");
+    var note=f.noteAdmin||"";
+    var nomSafe=(f.nom||"").replace(/'/g,"\\'");
+    return '<div class="fcard '+cls+'" id="fc-'+f.id+'">'+
+      '<div class="ftop"><div><div class="fname">'+f.nom+'</div><div class="fdate">&#128197; '+f.date+'</div></div>'+
+      '<div class="fprix">'+prixAff+'</div></div>'+
+      '<div class="fmeta">'+
+        '<span class="mtag">&#128241; <b>'+(f.telephone||'-')+'</b></span>'+
+        '<span class="mtag">&#128231; '+(f.email||'-')+'</span>'+
+        '<span class="mtag">&#128295; <b>'+(f.categorie||'-')+'</b></span>'+
+      '</div>'+
+      '<div class="fpresta">'+(f.prestation||'')+'</div>'+
+      '<div class="fprob">&#128203; '+(f.probleme||'-')+'</div>'+
+      '<div class="factions">'+
+        '<button class="bst bst-att" onclick="chgSt(\''+f.id+'\',\'En attente\')">&#9203; Attente</button>'+
+        '<button class="bst bst-enc" onclick="chgSt(\''+f.id+'\',\'En cours\')">&#128295; En cours</button>'+
+        '<button class="bst bst-fin" onclick="chgSt(\''+f.id+'\',\'Termin\u00e9\')">&#10003; Termin\u00e9</button>'+
+        '<a href="https://wa.me/'+waPhone+'?text='+waMsg+'" target="_blank" class="bwa">&#128172; Notifier</a>'+
+        '<button class="bdel" onclick="delF(\''+f.id+'\',\''+nomSafe+'\')">&#128465;</button>'+
+      '</div>'+
+      '<textarea class="note-area" id="note-'+f.id+'" rows="2" placeholder="Note interne...">'+note+'</textarea>'+
+      '<button class="btn-note" onclick="saveNote(\''+f.id+'\')">&#128190; Sauvegarder note</button>'+
+    '</div>';
+  }).join("");
+}
+function chgSt(id,statut){
+  ref.child(id).update({statut:statut})
+    .then(function(){toast("Statut \u2192 "+statut);})
+    .catch(function(e){toast("Erreur : "+e.message);});
+}
+function delF(id,nom){
+  if(!confirm("Supprimer le dossier de "+nom+" ?")) return;
+  ref.child(id).remove()
+    .then(function(){toast("Dossier supprim\u00e9.");})
+    .catch(function(e){toast("Erreur : "+e.message);});
+}
+function saveNote(id){
+  var v=(document.getElementById("note-"+id)||{}).value||"";
+  ref.child(id).update({noteAdmin:v})
+    .then(function(){toast("Note sauvegard\u00e9e.");})
+    .catch(function(e){toast("Erreur : "+e.message);});
+}
+</script>
+</body>
+</html>
